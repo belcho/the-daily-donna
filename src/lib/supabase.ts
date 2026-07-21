@@ -1,17 +1,12 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { householdId, isConfigured, supabaseAnonKey, supabaseUrl } from "./env";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-export const householdId = import.meta.env.VITE_HOUSEHOLD_ID as string | undefined;
-
-export function isConfigured(): boolean {
-  return Boolean(url && anonKey && householdId);
-}
+export { householdId, isConfigured };
 
 let client: SupabaseClient | null = null;
 
 export function getSupabase(): SupabaseClient {
-  if (!url || !anonKey) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error("Supabase is not configured");
   }
   if (!client) {
@@ -19,7 +14,7 @@ export function getSupabase(): SupabaseClient {
     if (householdId) {
       headers["x-household-id"] = householdId;
     }
-    client = createClient(url, anonKey, {
+    client = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers },
     });
   }
