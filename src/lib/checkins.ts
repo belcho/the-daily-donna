@@ -102,6 +102,7 @@ function mapRow(data: Record<string, unknown>): CheckinRow {
     creatures: Array.isArray(data.creatures)
       ? (data.creatures as string[])
       : [],
+    note: (data.note as string | null) ?? null,
     updated_at: data.updated_at as string | undefined,
   };
 }

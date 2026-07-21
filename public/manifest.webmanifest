@@ -3,8 +3,16 @@
   "short_name": "Daily Donna",
   "description": "Donna's daily check-in",
   "start_url": "/the-daily-donna/",
+  "scope": "/the-daily-donna/",
   "display": "standalone",
   "background_color": "#f3eef8",
   "theme_color": "#6b4f8a",
-  "icons": []
+  "icons": [
+    {
+      "src": "/the-daily-donna/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

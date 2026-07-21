@@ -106,6 +106,77 @@
   border-style: dashed;
 }
 
+.creature-day-detail {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.creature-stat-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.streak-banner {
+  text-align: center;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: var(--color-primary-soft);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+}
+
+.streak-text {
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.nudge-banner {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--color-bg-card);
+  border-radius: var(--radius);
+  border: 2px solid var(--color-accent);
+}
+
+.nudge-banner p {
+  margin: 0 0 0.75rem;
+}
+
+.install-card h2 {
+  margin-top: 0;
+}
+
+.note-input {
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+
+.field-label {
+  display: block;
+  font-weight: 600;
+  margin: 1rem 0 0.35rem;
+  color: var(--color-text-muted);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  font-weight: 500;
+}
+
+.toggle-row input {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 .review-block {
   margin-bottom: 1rem;
 }

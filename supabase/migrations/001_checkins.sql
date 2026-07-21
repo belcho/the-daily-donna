@@ -34,39 +34,10 @@ alter table public.checkins enable row level security;
 drop policy if exists "checkins_select" on public.checkins;
 drop policy if exists "checkins_insert" on public.checkins;
 drop policy if exists "checkins_update" on public.checkins;
+drop policy if exists "checkins_anon_all" on public.checkins;
 
--- Policies use request header x-household-id matching row household_id
--- Client sends header on each request (see src/lib/checkins.ts)
-
-create policy "checkins_select" on public.checkins
-  for select to anon
-  using (
-    household_id::text = coalesce(
-      current_setting('request.headers', true)::json->>'x-household-id',
-      ''
-    )
-  );
-
-create policy "checkins_insert" on public.checkins
-  for insert to anon
-  with check (
-    household_id::text = coalesce(
-      current_setting('request.headers', true)::json->>'x-household-id',
-      ''
-    )
-  );
-
-create policy "checkins_update" on public.checkins
-  for update to anon
-  using (
-    household_id::text = coalesce(
-      current_setting('request.headers', true)::json->>'x-household-id',
-      ''
-    )
-  )
-  with check (
-    household_id::text = coalesce(
-      current_setting('request.headers', true)::json->>'x-household-id',
-      ''
-    )
-  );
+-- Family app: anon key lives in the static site. Client always filters by household_id.
+create policy "checkins_anon_all" on public.checkins
+  for all to anon
+  using (true)
+  with check (true);

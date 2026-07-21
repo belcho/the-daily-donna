@@ -14,7 +14,7 @@ import {
 import { renderSummary } from "../components/summary";
 import { formStateToRowFields } from "../types";
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -104,6 +104,8 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         if (!form.more_creatures) return true;
         return form.creatures.length > 0;
       case 8:
+        return true;
+      case 9:
         return true;
       default:
         return false;
@@ -396,6 +398,32 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         break;
       }
       case 8: {
+        body.append(
+          el("h2", {
+            className: "step-title",
+            text: "Anything else today?",
+          }),
+          el("p", {
+            className: "step-hint",
+            text: "Optional note — skip if you like.",
+          })
+        );
+        const noteInput = el("textarea", {
+          className: "note-input",
+          attrs: {
+            rows: "4",
+            placeholder: "A thought, a win, or what you’re looking forward to…",
+          },
+        }) as HTMLTextAreaElement;
+        noteInput.value = form.note;
+        noteInput.addEventListener("input", () => {
+          form.note = noteInput.value;
+          scheduleSave();
+        });
+        body.append(noteInput);
+        break;
+      }
+      case 9: {
         body.append(
           el("h2", {
             className: "step-title",

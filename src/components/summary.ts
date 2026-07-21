@@ -60,6 +60,10 @@ export function renderSummary(row: CheckinRow): HTMLElement {
     { label: "Nature watch", value: nature || "—" },
   ];
 
+  if (row.note?.trim()) {
+    sections.push({ label: "Note", value: row.note.trim() });
+  }
+
   for (const s of sections) {
     wrap.append(
       el("div", { className: "summary-section" }, [
