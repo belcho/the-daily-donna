@@ -151,6 +151,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
         el("a", { text: "Past days", attrs: { href: "#/history" } }),
         el("a", { text: "Creature log", attrs: { href: "#/creatures" } }),
         el("a", { text: "Reminder", attrs: { href: "#/reminders" } }),
+        el("a", { text: "Bugs & ideas", attrs: { href: "#/feedback" } }),
       ])
     );
   } catch (err) {

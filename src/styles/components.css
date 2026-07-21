@@ -237,3 +237,114 @@
 .photo-upload-row {
   margin-top: 0.75rem;
 }
+
+.feedback-tracker-heading {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.15rem;
+  color: var(--color-primary-dark);
+}
+
+.feedback-section-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+.feedback-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feedback-item {
+  margin-bottom: 0.75rem;
+}
+
+.feedback-item-header {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.feedback-badge,
+.feedback-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.feedback-badge-bug {
+  background: #fce8ea;
+  color: var(--color-danger);
+}
+
+.feedback-badge-feature {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.feedback-status-open {
+  background: #fff8e6;
+  color: #7a5c00;
+}
+
+.feedback-status-planned {
+  background: #e8f0fc;
+  color: #2a4a7a;
+}
+
+.feedback-status-fixed {
+  background: #e6f4ea;
+  color: var(--color-success);
+}
+
+.feedback-status-wontfix {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+[data-theme="dark"] .feedback-badge-bug {
+  background: #4a2a2e;
+}
+
+[data-theme="dark"] .feedback-status-open {
+  background: #3d3520;
+  color: #f0e6b8;
+}
+
+.feedback-item-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.feedback-item-date {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.feedback-item-details {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.feedback-title-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  min-height: 44px;
+}
+
+.feedback-status-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg-card);
+  color: var(--color-text);
+}
