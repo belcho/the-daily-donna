@@ -64,6 +64,22 @@ export function renderSummary(row: CheckinRow): HTMLElement {
     sections.push({ label: "Note", value: row.note.trim() });
   }
 
+  if (row.photo_url) {
+    const photoWrap = el("div", { className: "summary-section" }, [
+      el("div", { className: "summary-label", text: "Photo" }),
+    ]);
+    const img = el("img", {
+      className: "checkin-photo",
+      attrs: {
+        src: row.photo_url,
+        alt: "Creature or bunny photo from today",
+        loading: "lazy",
+      },
+    });
+    photoWrap.append(img);
+    wrap.append(photoWrap);
+  }
+
   for (const s of sections) {
     wrap.append(
       el("div", { className: "summary-section" }, [

@@ -5,6 +5,7 @@ import {
   requestNotificationPermission,
 } from "../lib/reminders";
 import { isInstalledPwa } from "../lib/pwa";
+import { getTheme, setTheme } from "../lib/theme";
 
 export function renderReminders(root: HTMLElement): void {
   clear(root);
@@ -110,6 +111,23 @@ export function renderReminders(root: HTMLElement): void {
     status
   );
   root.append(card);
+
+  const themeCard = el("div", { className: "card" });
+  const darkId = "theme-dark";
+  const darkLabel = el("label", {
+    className: "toggle-row",
+    attrs: { for: darkId },
+  });
+  const darkInput = el("input", {
+    attrs: { id: darkId, type: "checkbox" },
+  }) as HTMLInputElement;
+  darkInput.checked = getTheme() === "dark";
+  darkLabel.append(darkInput, el("span", { text: "Dark mode" }));
+  darkInput.addEventListener("change", () => {
+    setTheme(darkInput.checked ? "dark" : "light");
+  });
+  themeCard.append(el("h2", { text: "Appearance" }), darkLabel);
+  root.append(themeCard);
 
   if (!isInstalledPwa()) {
     root.append(

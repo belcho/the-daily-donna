@@ -16,7 +16,8 @@ A gentle daily check-in for Donna — mood, vitamins, appointments, pain, and cr
 1. Create a free project at [supabase.com](https://supabase.com).
 2. Open **SQL Editor** and run the script in [`supabase/migrations/001_checkins.sql`](supabase/migrations/001_checkins.sql).
 3. Run [`supabase/migrations/002_add_note.sql`](supabase/migrations/002_add_note.sql) for optional daily notes.
-4. In **Project Settings → API**, copy:
+4. Run [`supabase/migrations/003_photo_storage.sql`](supabase/migrations/003_photo_storage.sql) for photo uploads.
+5. In **Project Settings → API**, copy:
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon public** key → `VITE_SUPABASE_ANON_KEY`
 5. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).

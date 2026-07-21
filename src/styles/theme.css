@@ -20,6 +20,27 @@
   --safe-right: env(safe-area-inset-right, 0px);
 }
 
+[data-theme="dark"] {
+  --color-bg: #1a1522;
+  --color-bg-card: #2a2235;
+  --color-text: #f3eef8;
+  --color-text-muted: #c4b8d4;
+  --color-primary: #b89ad4;
+  --color-primary-dark: #d4c2e8;
+  --color-primary-soft: #3d3250;
+  --color-border: #4a3d5c;
+  --color-accent: #9b7bb8;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .nudge-banner {
+  background: var(--color-bg-card);
+}
+
+[data-theme="dark"] a {
+  color: var(--color-primary);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -20,6 +20,7 @@ export interface CheckinRow {
   saw_bunnies: boolean | null;
   creatures: string[];
   note: string | null;
+  photo_url: string | null;
   updated_at?: string;
 }
 
@@ -34,6 +35,7 @@ export interface CheckinFormState {
   more_creatures: boolean | null;
   creatures: string[];
   note: string;
+  photo_url: string | null;
 }
 
 export function emptyFormState(): CheckinFormState {
@@ -48,6 +50,7 @@ export function emptyFormState(): CheckinFormState {
     more_creatures: null,
     creatures: [],
     note: "",
+    photo_url: null,
   };
 }
 
@@ -74,6 +77,7 @@ export function rowToFormState(row: CheckinRow): CheckinFormState {
           : null,
     creatures: [...row.creatures],
     note: row.note ?? "",
+    photo_url: row.photo_url ?? null,
   };
 }
 
@@ -104,5 +108,6 @@ export function formStateToRowFields(
     saw_bunnies: form.saw_bunnies,
     creatures,
     note: form.note.trim() || null,
+    photo_url: form.photo_url,
   };
 }

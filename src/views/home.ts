@@ -10,6 +10,13 @@ import {
 } from "../lib/reminders";
 import { isInstalledPwa } from "../lib/pwa";
 import { donnaCheckInButton } from "../lib/donnaGate";
+import { getDonnaGreeting } from "../lib/greeting";
+import {
+  renderVerseCard,
+  renderWeatherCard,
+  renderWeatherLoading,
+} from "../components/homeExtras";
+import { fetchKentuckyWeather } from "../lib/weather";
 
 export async function renderHome(root: HTMLElement): Promise<void> {
   clear(root);
@@ -38,6 +45,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
     clear(root);
 
     const streak = computeStreak(history.map((h) => h.checkin_date));
+    const greeting = getDonnaGreeting();
 
     const header = el("header", { className: "app-header" }, [
       el("h1", { text: "The Daily Donna" }),
@@ -47,6 +55,29 @@ export async function renderHome(root: HTMLElement): Promise<void> {
       }),
     ]);
     root.append(header);
+
+    root.append(renderVerseCard(date));
+
+    const weatherSlot = el("div", { attrs: { id: "weather-slot" } });
+    weatherSlot.append(renderWeatherLoading());
+    root.append(weatherSlot);
+    void fetchKentuckyWeather()
+      .then((cities) => {
+        weatherSlot.replaceChildren(
+          renderWeatherCard(cities, row?.saw_bunnies ?? null)
+        );
+      })
+      .catch(() => {
+        weatherSlot.replaceChildren(
+          el("div", { className: "card" }, [
+            el("h2", { text: "Weather bunny" }),
+            el("p", {
+              className: "step-hint",
+              text: "Weather is taking a coffee break — try again later.",
+            }),
+          ])
+        );
+      });
 
     if (streak > 0) {
       root.append(
@@ -77,7 +108,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
       const card = el("div", { className: "card" });
       card.append(
         el("h2", {
-          text: row ? "Continue your check-in" : "Good morning, Donna",
+          text: row ? "Continue your check-in" : greeting,
         }),
         el("p", {
           text: row
@@ -92,7 +123,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
       root.append(card);
     } else {
       const card = el("div", { className: "card" });
-      card.append(el("h2", { text: "Today’s check-in" }));
+      card.append(el("h2", { text: greeting }));
       card.append(renderSummary(row));
       card.append(
         el("p", {

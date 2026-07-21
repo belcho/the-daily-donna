@@ -13,8 +13,9 @@ import {
 } from "../components/widgets";
 import { renderSummary } from "../components/summary";
 import { formStateToRowFields } from "../types";
+import { uploadCheckinPhoto } from "../lib/photos";
 
-const TOTAL_STEPS = 9;
+const TOTAL_STEPS = 10;
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -106,6 +107,8 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
       case 8:
         return true;
       case 9:
+        return true;
+      case 10:
         return true;
       default:
         return false;
@@ -401,6 +404,77 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         body.append(
           el("h2", {
             className: "step-title",
+            text: "Got a photo?",
+          }),
+          el("p", {
+            className: "step-hint",
+            text: "Optional — bunnies, creatures, or something that made you smile.",
+          })
+        );
+        const previewHost = el("div", { className: "photo-upload-row" });
+        const fileInput = el("input", {
+          attrs: {
+            type: "file",
+            accept: "image/*",
+            capture: "environment",
+          },
+        }) as HTMLInputElement;
+
+        function showPreview(url: string | null): void {
+          clear(previewHost);
+          if (url) {
+            previewHost.append(
+              el("img", {
+                className: "photo-preview",
+                attrs: { src: url, alt: "Your photo for today" },
+              })
+            );
+          }
+        }
+        showPreview(form.photo_url);
+
+        fileInput.addEventListener("change", () => {
+          const file = fileInput.files?.[0];
+          if (!file) return;
+          saveStatus = "Uploading photo…";
+          render();
+          void (async () => {
+            try {
+              const url = await uploadCheckinPhoto(checkinDate, file);
+              form.photo_url = url;
+              showPreview(url);
+              await persistDraft();
+            } catch {
+              saveStatus = "Photo upload failed — is storage set up?";
+              render();
+            }
+          })();
+        });
+
+        body.append(fileInput, previewHost);
+        if (form.photo_url) {
+          body.append(
+            el("button", {
+              className: "btn btn-ghost",
+              text: "Remove photo",
+              attrs: { type: "button" },
+              on: {
+                click: () => {
+                  form.photo_url = null;
+                  showPreview(null);
+                  scheduleSave();
+                  render();
+                },
+              },
+            })
+          );
+        }
+        break;
+      }
+      case 9: {
+        body.append(
+          el("h2", {
+            className: "step-title",
             text: "Anything else today?",
           }),
           el("p", {
@@ -423,7 +497,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         body.append(noteInput);
         break;
       }
-      case 9: {
+      case 10: {
         body.append(
           el("h2", {
             className: "step-title",
