@@ -9,6 +9,7 @@ import {
   shouldShowReminderNudge,
 } from "../lib/reminders";
 import { isInstalledPwa } from "../lib/pwa";
+import { donnaCheckInButton } from "../lib/donnaGate";
 
 export async function renderHome(root: HTMLElement): Promise<void> {
   clear(root);
@@ -67,11 +68,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
           el("p", {
             text: "Whenever you’re ready — today’s check-in is waiting for you.",
           }),
-          el("a", {
-            className: "btn btn-primary btn-block",
-            text: "Do today’s check-in",
-            attrs: { href: "#/check-in" },
-          }),
+          donnaCheckInButton("Do today’s check-in", "btn btn-primary btn-block"),
         ])
       );
     }
@@ -87,11 +84,10 @@ export async function renderHome(root: HTMLElement): Promise<void> {
             ? "You started today’s check-in. Pick up where you left off."
             : "A quick daily check-in — silly in spots, serious where it counts.",
         }),
-        el("a", {
-          className: "btn btn-primary btn-block",
-          text: row ? "Continue check-in" : "Start today’s check-in",
-          attrs: { href: "#/check-in" },
-        })
+        donnaCheckInButton(
+          row ? "Continue check-in" : "Start today’s check-in",
+          "btn btn-primary btn-block"
+        )
       );
       root.append(card);
     } else {
@@ -103,11 +99,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
           className: "step-hint",
           text: "You can update today’s answers until 5 AM tomorrow.",
         }),
-        el("a", {
-          className: "btn btn-secondary btn-block",
-          text: "Update today’s answers",
-          attrs: { href: "#/check-in" },
-        })
+        donnaCheckInButton("Update today’s answers", "btn btn-secondary btn-block"),
       );
       root.append(card);
     }
