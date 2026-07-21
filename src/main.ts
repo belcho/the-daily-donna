@@ -1,0 +1,6 @@
+import "./styles/theme.css";
+import "./styles/layout.css";
+import "./styles/components.css";
+import { initApp } from "./app";
+
+initApp();
