@@ -18,6 +18,7 @@ export interface CheckinRow {
   appointments: Appointment[];
   pain_level: number | null;
   saw_bunnies: boolean | null;
+  bunny_count: number | null;
   creatures: string[];
   note: string | null;
   photo_url: string | null;
@@ -32,6 +33,7 @@ export interface CheckinFormState {
   appointments: Appointment[];
   pain_level: number | null;
   saw_bunnies: boolean | null;
+  bunny_count: number | null;
   more_creatures: boolean | null;
   creatures: string[];
   note: string;
@@ -47,6 +49,7 @@ export function emptyFormState(): CheckinFormState {
     appointments: [],
     pain_level: null,
     saw_bunnies: null,
+    bunny_count: null,
     more_creatures: null,
     creatures: [],
     note: "",
@@ -69,6 +72,7 @@ export function rowToFormState(row: CheckinRow): CheckinFormState {
     appointments: row.appointments.length ? [...row.appointments] : [],
     pain_level: row.pain_level,
     saw_bunnies: row.saw_bunnies,
+    bunny_count: row.bunny_count,
     more_creatures:
       row.creatures.length > 0
         ? true
@@ -106,6 +110,12 @@ export function formStateToRowFields(
     appointments,
     pain_level: form.pain_level,
     saw_bunnies: form.saw_bunnies,
+    bunny_count:
+      form.saw_bunnies === true
+        ? form.bunny_count != null && form.bunny_count > 0
+          ? form.bunny_count
+          : null
+        : null,
     creatures,
     note: form.note.trim() || null,
     photo_url: form.photo_url,

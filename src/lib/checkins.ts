@@ -99,6 +99,7 @@ function mapRow(data: Record<string, unknown>): CheckinRow {
     appointments,
     pain_level: data.pain_level as number | null,
     saw_bunnies: data.saw_bunnies as boolean | null,
+    bunny_count: data.bunny_count as number | null,
     creatures: Array.isArray(data.creatures)
       ? (data.creatures as string[])
       : [],

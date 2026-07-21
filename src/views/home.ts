@@ -15,6 +15,7 @@ import {
   renderVerseCard,
   renderWeatherCard,
   renderWeatherLoading,
+  renderGlanceBar,
 } from "../components/homeExtras";
 import { fetchKentuckyWeather } from "../lib/weather";
 
@@ -44,114 +45,91 @@ export async function renderHome(root: HTMLElement): Promise<void> {
 
     clear(root);
 
+    const shell = el("div", { className: "home-stack" });
+    root.append(shell);
+
     const streak = computeStreak(history.map((h) => h.checkin_date));
     const greeting = getDonnaGreeting();
 
-    const header = el("header", { className: "app-header" }, [
-      el("h1", { text: "The Daily Donna" }),
-      el("p", {
-        className: "tagline",
-        text: formatDisplayDate(date),
-      }),
-    ]);
-    root.append(header);
+    shell.append(
+      el("header", { className: "app-header app-header-compact" }, [
+        el("h1", { text: "The Daily Donna" }),
+        el("p", { className: "tagline", text: formatDisplayDate(date) }),
+      ])
+    );
 
-    root.append(renderVerseCard(date));
+    shell.append(renderGlanceBar(streak, history));
 
-    const weatherSlot = el("div", { attrs: { id: "weather-slot" } });
+    shell.append(renderVerseCard(date));
+
+    const weatherSlot = el("div");
     weatherSlot.append(renderWeatherLoading());
-    root.append(weatherSlot);
+    shell.append(weatherSlot);
     void fetchKentuckyWeather()
       .then((cities) => {
-        weatherSlot.replaceChildren(
-          renderWeatherCard(cities, row?.saw_bunnies ?? null)
-        );
+        weatherSlot.replaceChildren(renderWeatherCard(cities, row));
       })
       .catch(() => {
         weatherSlot.replaceChildren(
-          el("div", { className: "card" }, [
+          el("div", { className: "card card-compact" }, [
             el("h2", { text: "Weather bunny" }),
             el("p", {
               className: "step-hint",
-              text: "Weather is taking a coffee break — try again later.",
+              text: "Weather unavailable — try again later.",
             }),
           ])
         );
       });
 
-    if (streak > 0) {
-      root.append(
-        el("div", { className: "streak-banner" }, [
-          el("span", {
-            className: "streak-text",
-            text:
-              streak === 1
-                ? "1 day in a row — nice start!"
-                : `${streak} days in a row — you’re on a roll!`,
-          }),
-        ])
-      );
-    }
-
     if (shouldShowReminderNudge(todaySubmitted)) {
-      root.append(
-        el("div", { className: "nudge-banner" }, [
-          el("p", {
-            text: "Whenever you’re ready — today’s check-in is waiting for you.",
-          }),
-          donnaCheckInButton("Do today’s check-in", "btn btn-primary btn-block"),
+      shell.append(
+        el("div", { className: "nudge-banner nudge-banner-compact" }, [
+          el("p", { text: "Today’s check-in is waiting whenever you’re ready." }),
+          donnaCheckInButton("Check in", "btn btn-primary btn-block"),
         ])
       );
     }
 
     if (!row || row.status === "draft") {
-      const card = el("div", { className: "card" });
+      const card = el("div", { className: "card card-compact card-primary-action" });
       card.append(
-        el("h2", {
-          text: row ? "Continue your check-in" : greeting,
-        }),
+        el("h2", { text: row ? "Continue your check-in" : greeting }),
         el("p", {
+          className: "home-lead",
           text: row
-            ? "You started today’s check-in. Pick up where you left off."
-            : "A quick daily check-in — silly in spots, serious where it counts.",
+            ? "Pick up where you left off."
+            : "Quick daily check-in — silly in spots, serious where it counts.",
         }),
         donnaCheckInButton(
-          row ? "Continue check-in" : "Start today’s check-in",
+          row ? "Continue" : "Start check-in",
           "btn btn-primary btn-block"
         )
       );
-      root.append(card);
+      shell.append(card);
     } else {
-      const card = el("div", { className: "card" });
-      card.append(el("h2", { text: greeting }));
-      card.append(renderSummary(row));
+      const card = el("div", { className: "card card-compact" });
+      card.append(el("h2", { text: greeting }), renderSummary(row));
       card.append(
-        el("p", {
-          className: "step-hint",
-          text: "You can update today’s answers until 5 AM tomorrow.",
-        }),
-        donnaCheckInButton("Update today’s answers", "btn btn-secondary btn-block"),
+        donnaCheckInButton("Update today", "btn btn-secondary btn-block"),
       );
-      root.append(card);
+      shell.append(card);
     }
 
     if (!isInstalledPwa()) {
-      root.append(
-        el("div", { className: "card install-card" }, [
-          el("h2", { text: "Add to Home Screen" }),
-          el("p", {
-            text: "Tap Share in Safari, then “Add to Home Screen” for a purple app icon on Donna’s phone.",
-          }),
-        ])
+      shell.append(
+        el("p", {
+          className: "install-hint",
+          text: "Tip: Share → Add to Home Screen for Donna’s purple app icon.",
+        })
       );
     }
 
-    root.append(
-      el("nav", { className: "app-footer-nav" }, [
+    shell.append(
+      el("nav", { className: "app-footer-nav app-footer-compact" }, [
         el("a", { text: "Past days", attrs: { href: "#/history" } }),
-        el("a", { text: "Creature log", attrs: { href: "#/creatures" } }),
+        el("a", { text: "Creatures", attrs: { href: "#/creatures" } }),
         el("a", { text: "Reminder", attrs: { href: "#/reminders" } }),
-        el("a", { text: "Bugs & ideas", attrs: { href: "#/feedback" } }),
+        el("a", { text: "Bugs", attrs: { href: "#/feedback" } }),
       ])
     );
   } catch (err) {

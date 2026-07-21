@@ -99,7 +99,9 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
       case 5:
         return form.pain_level != null;
       case 6:
-        return form.saw_bunnies != null;
+        if (form.saw_bunnies == null) return false;
+        if (form.saw_bunnies === false) return true;
+        return form.bunny_count != null && form.bunny_count >= 1;
       case 7:
         if (form.more_creatures == null) return false;
         if (!form.more_creatures) return true;
@@ -371,23 +373,95 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         );
         renderPain(body);
         break;
-      case 6:
+      case 6: {
         body.append(
           el("h2", {
             className: "step-title",
             text: "Did you see any bunnies today?",
-          }),
+          })
+        );
+        const bunnyHost = el("div");
+        bunnyHost.append(
           yesNoChoice(
             form.saw_bunnies,
             (v) => {
               form.saw_bunnies = v;
+              if (!v) {
+                form.bunny_count = null;
+              } else if (form.bunny_count == null || form.bunny_count < 1) {
+                form.bunny_count = 1;
+              }
               scheduleSave();
               render();
             },
             "Bunnies today"
           )
         );
+        if (form.saw_bunnies === true) {
+          bunnyHost.append(
+            el("p", {
+              className: "step-hint",
+              text: "How many bunnies?",
+            })
+          );
+          const grid = el("div", {
+            className: "pain-grid bunny-count-grid",
+            attrs: { role: "group", "aria-label": "How many bunnies" },
+          });
+          for (let n = 1; n <= 12; n++) {
+            grid.append(
+              el("button", {
+                className: "pain-btn",
+                text: String(n),
+                attrs: {
+                  type: "button",
+                  "aria-pressed":
+                    form.bunny_count === n ? "true" : "false",
+                  "aria-label": `${n} bunnies`,
+                },
+                on: {
+                  click: () => {
+                    form.bunny_count = n;
+                    scheduleSave();
+                    render();
+                  },
+                },
+              })
+            );
+          }
+          bunnyHost.append(grid);
+          const moreRow = el("div", { className: "bunny-more-row" });
+          const moreLabel = el("label", {
+            attrs: { for: "bunny-more" },
+            text: "More than 12?",
+            className: "field-label",
+          });
+          const moreInput = el("input", {
+            attrs: {
+              id: "bunny-more",
+              type: "number",
+              min: "13",
+              max: "999",
+              placeholder: "13+",
+            },
+          }) as HTMLInputElement;
+          if (form.bunny_count != null && form.bunny_count > 12) {
+            moreInput.value = String(form.bunny_count);
+          }
+          moreInput.addEventListener("change", () => {
+            const v = parseInt(moreInput.value, 10);
+            if (v >= 13) {
+              form.bunny_count = v;
+              scheduleSave();
+              render();
+            }
+          });
+          moreRow.append(moreLabel, moreInput);
+          bunnyHost.append(moreRow);
+        }
+        body.append(bunnyHost);
         break;
+      }
       case 7: {
         body.append(
           el("h2", {

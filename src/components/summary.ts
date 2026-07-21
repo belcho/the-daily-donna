@@ -40,7 +40,11 @@ export function renderSummary(row: CheckinRow): HTMLElement {
 
   let nature = "";
   if (row.saw_bunnies === true) {
-    nature = "Bunnies: yes!";
+    const n = row.bunny_count;
+    nature =
+      n != null && n > 0
+        ? `Bunnies: yes — ${n} spotted!`
+        : "Bunnies: yes!";
   } else if (row.saw_bunnies === false) {
     nature = "No bunnies spotted today.";
   }

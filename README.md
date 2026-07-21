@@ -18,10 +18,11 @@ A gentle daily check-in for Donna — mood, vitamins, appointments, pain, and cr
 3. Run [`supabase/migrations/002_add_note.sql`](supabase/migrations/002_add_note.sql) for optional daily notes.
 4. Run [`supabase/migrations/003_photo_storage.sql`](supabase/migrations/003_photo_storage.sql) for photo uploads.
 5. Run [`supabase/migrations/004_feedback.sql`](supabase/migrations/004_feedback.sql) for the bugs & ideas list.
-6. In **Project Settings → API**, copy:
+6. Run [`supabase/migrations/005_bunny_count.sql`](supabase/migrations/005_bunny_count.sql) for bunny counts.
+7. In **Project Settings → API**, copy:
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon public** key → `VITE_SUPABASE_ANON_KEY`
-7. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
+8. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
 
 Row-level security expects the `x-household-id` header (set automatically by the app). If inserts fail with a permission error, confirm the migration ran and that your household UUID is valid.
 
