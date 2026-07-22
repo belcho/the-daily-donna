@@ -58,7 +58,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
       ])
     );
 
-    shell.append(renderGlanceBar(streak, history));
+    shell.append(renderGlanceBar(streak, history, row));
 
     shell.append(renderVerseCard(date));
 

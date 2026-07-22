@@ -6,14 +6,49 @@ import type { CheckinRow } from "../types";
 import {
   computeBunnyRecord,
   formatBunnyRecord,
+  effectiveBunnyCount,
+  formatTodayBunnies,
 } from "../lib/bunnyRecord";
+
+function bunnyTrackerLabel(
+  history: Pick<CheckinRow, "bunny_count" | "saw_bunnies" | "checkin_date">[],
+  todayRow: Pick<
+    CheckinRow,
+    "bunny_count" | "saw_bunnies" | "checkin_date" | "status"
+  > | null
+): string {
+  const record = computeBunnyRecord(history);
+  const todayCount =
+    todayRow && todayRow.saw_bunnies === true
+      ? effectiveBunnyCount(todayRow)
+      : 0;
+
+  if (todayCount > 0) {
+    const best = record?.count ?? 0;
+    if (todayCount > best) {
+      return `${formatTodayBunnies(todayCount)} · New record!`;
+    }
+    if (record) {
+      return `${formatTodayBunnies(todayCount)} · Record: ${formatBunnyRecord(record)}`;
+    }
+    return formatTodayBunnies(todayCount);
+  }
+
+  if (record) {
+    return `Record: ${formatBunnyRecord(record)}`;
+  }
+  return "No bunny record yet";
+}
 
 export function renderGlanceBar(
   streak: number,
-  history: Pick<CheckinRow, "bunny_count" | "saw_bunnies" | "checkin_date">[]
+  history: Pick<CheckinRow, "bunny_count" | "saw_bunnies" | "checkin_date">[],
+  todayRow: Pick<
+    CheckinRow,
+    "bunny_count" | "saw_bunnies" | "checkin_date" | "status"
+  > | null
 ): HTMLElement {
   const bar = el("div", { className: "home-glance-bar" });
-  const record = computeBunnyRecord(history);
 
   if (streak > 0) {
     bar.append(
@@ -29,10 +64,10 @@ export function renderGlanceBar(
 
   bar.append(
     el("div", { className: "glance-chip glance-chip-bunny" }, [
-      el("span", { className: "glance-chip-label", text: "Bunny record" }),
+      el("span", { className: "glance-chip-label", text: "Bunny tracker" }),
       el("span", {
         className: "glance-chip-value",
-        text: record ? formatBunnyRecord(record) : "—",
+        text: bunnyTrackerLabel(history, todayRow),
       }),
     ])
   );
@@ -58,14 +93,11 @@ export function renderWeatherCard(
 
   const bunnyAnswer = row?.saw_bunnies ?? null;
   if (bunnyAnswer === true) {
-    const n = row?.bunny_count;
+    const n = row ? effectiveBunnyCount(row) : 0;
     card.append(
       el("p", {
         className: "weather-bunny-yes",
-        text:
-          n != null && n > 0
-            ? `You counted ${n} bunny${n === 1 ? "" : "ies"} today — nice!`
-            : "You saw bunnies today — the weather bunny is proud.",
+        text: `You counted ${n} bunny${n === 1 ? "" : "ies"} today — nice!`,
       })
     );
   } else if (bunnyAnswer === false) {

@@ -3,6 +3,7 @@ import { fetchSubmittedHistory } from "../lib/checkins";
 import { isConfigured } from "../lib/supabase";
 import { creatureLabel } from "../data/creatures";
 import { formatDisplayDate } from "../lib/checkinDate";
+import { effectiveBunnyCount } from "../lib/bunnyRecord";
 
 export async function renderCreatureLog(root: HTMLElement): Promise<void> {
   clear(root);
@@ -53,19 +54,30 @@ export async function renderCreatureLog(root: HTMLElement): Promise<void> {
         ])
       );
     } else {
+      let totalBunnies = 0;
       const counts = new Map<string, number>();
-    for (const row of sightings) {
-      const ids = new Set<string>();
-      if (row.saw_bunnies) ids.add("bunny");
-      for (const id of row.creatures) ids.add(id);
-      for (const id of ids) {
-        counts.set(id, (counts.get(id) ?? 0) + 1);
+      for (const row of sightings) {
+        const ids = new Set<string>();
+        if (row.saw_bunnies) {
+          ids.add("bunny");
+          totalBunnies += effectiveBunnyCount(row);
+        }
+        for (const id of row.creatures) ids.add(id);
+        for (const id of ids) {
+          counts.set(id, (counts.get(id) ?? 0) + 1);
+        }
       }
-    }
 
-    const stats = el("div", { className: "card" });
-    stats.append(el("h2", { text: "Totals" }));
-    const statList = el("ul", { className: "creature-stat-list" });
+      const stats = el("div", { className: "card" });
+      stats.append(el("h2", { text: "Totals" }));
+      const statList = el("ul", { className: "creature-stat-list" });
+      if (totalBunnies > 0) {
+        statList.append(
+          el("li", {
+            text: `Total bunnies counted: ${totalBunnies}`,
+          })
+        );
+      }
     const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
     for (const [id, count] of sorted) {
       statList.append(
@@ -80,7 +92,10 @@ export async function renderCreatureLog(root: HTMLElement): Promise<void> {
       const list = el("ul", { className: "history-list" });
       for (const row of sightings) {
         const parts: string[] = [];
-        if (row.saw_bunnies) parts.push("Bunnies");
+        if (row.saw_bunnies) {
+          const n = effectiveBunnyCount(row);
+          parts.push(n === 1 ? "1 bunny" : `${n} bunnies`);
+        }
         for (const id of row.creatures) {
           if (id !== "bunny" || !row.saw_bunnies) {
             parts.push(creatureLabel(id));

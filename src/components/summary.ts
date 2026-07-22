@@ -1,6 +1,7 @@
 import type { CheckinRow } from "../types";
 import { creatureLabel } from "../data/creatures";
 import { moodLabel } from "../data/mood";
+import { effectiveBunnyCount } from "../lib/bunnyRecord";
 import { el } from "../lib/dom";
 
 export function renderSummary(row: CheckinRow): HTMLElement {
@@ -40,11 +41,8 @@ export function renderSummary(row: CheckinRow): HTMLElement {
 
   let nature = "";
   if (row.saw_bunnies === true) {
-    const n = row.bunny_count;
-    nature =
-      n != null && n > 0
-        ? `Bunnies: yes — ${n} spotted!`
-        : "Bunnies: yes!";
+    const n = effectiveBunnyCount(row);
+    nature = `Bunnies: yes — ${n} spotted!`;
   } else if (row.saw_bunnies === false) {
     nature = "No bunnies spotted today.";
   }
