@@ -1,7 +1,11 @@
 import { el } from "../lib/dom";
 import { verseForCheckinDate } from "../data/verses";
 import type { CityWeather } from "../lib/weather";
-import { formatWeatherSnapshotLine } from "../lib/weather";
+import {
+  formatWeatherSnapshotLine,
+  weatherIconForCode,
+  weatherIconLabel,
+} from "../lib/weather";
 import type { CheckinRow } from "../types";
 import {
   computeBunnyRecord,
@@ -157,8 +161,83 @@ export function renderWeatherCard(
 }
 
 export function renderWeatherLoading(): HTMLElement {
-  return el("div", { className: "card card-compact weather-card" }, [
-    el("h2", { text: "Weather bunny" }),
-    el("p", { className: "step-hint", text: "Checking Lexington & Harlan…" }),
-  ]);
+  return el("button", {
+    className: "weather-fab weather-fab-loading",
+    attrs: {
+      type: "button",
+      "aria-label": "Loading weather",
+      disabled: "true",
+    },
+    text: "…",
+  });
+}
+
+/** Clickable weather icon; opens a modal with today’s forecast. */
+export function mountWeatherFab(
+  anchor: HTMLElement,
+  cities: CityWeather[],
+  row: Pick<CheckinRow, "saw_bunnies" | "bunny_count"> | null
+): void {
+  const lex = cities[0];
+  const code = lex?.now.weatherCode ?? 0;
+  const icon = weatherIconForCode(code);
+  const label = lex
+    ? `${lex.name}: ${lex.now.temperatureF}°F, ${lex.now.description}`
+    : "Today’s weather";
+
+  const btn = el("button", {
+    className: "weather-fab",
+    attrs: {
+      type: "button",
+      "aria-label": `Weather — ${label}. Tap for details.`,
+      title: weatherIconLabel(code),
+    },
+    text: icon,
+  });
+
+  btn.addEventListener("click", () => {
+    openWeatherModal(cities, row);
+  });
+
+  anchor.replaceChildren(btn);
+}
+
+function openWeatherModal(
+  cities: CityWeather[],
+  row: Pick<CheckinRow, "saw_bunnies" | "bunny_count"> | null
+): void {
+  const backdrop = el("div", {
+    className: "weather-modal-backdrop",
+    attrs: { role: "presentation" },
+  });
+  const panel = el("div", {
+    className: "weather-modal",
+    attrs: { role: "dialog", "aria-labelledby": "weather-modal-title" },
+  });
+
+  const close = (): void => {
+    backdrop.remove();
+    document.body.classList.remove("weather-modal-open");
+  };
+
+  panel.append(
+    el("div", { className: "weather-modal-header" }, [
+      el("h2", { attrs: { id: "weather-modal-title" }, text: "Today’s weather" }),
+      el("button", {
+        className: "weather-modal-close",
+        text: "Close",
+        attrs: { type: "button" },
+        on: { click: close },
+      }),
+    ]),
+    renderWeatherCard(cities, row)
+  );
+
+  backdrop.append(panel);
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  document.body.classList.add("weather-modal-open");
+  document.body.append(backdrop);
 }

@@ -13,9 +13,9 @@ import { donnaCheckInButton } from "../lib/donnaGate";
 import { getDonnaGreeting } from "../lib/greeting";
 import {
   renderVerseCard,
-  renderWeatherCard,
-  renderWeatherLoading,
   renderGlanceBar,
+  renderWeatherLoading,
+  mountWeatherFab,
 } from "../components/homeExtras";
 import { fetchKentuckyWeather } from "../lib/weather";
 
@@ -52,34 +52,38 @@ export async function renderHome(root: HTMLElement): Promise<void> {
     const greeting = getDonnaGreeting();
 
     shell.append(
-      el("header", { className: "app-header app-header-compact" }, [
-        el("h1", { text: "The Daily Donna" }),
+      el("header", { className: "app-header app-header-compact app-header-with-weather" }, [
+        el("div", { className: "app-header-row" }, [
+          el("h1", { text: "The Daily Donna" }),
+          el("div", { className: "weather-fab-slot" }),
+        ]),
         el("p", { className: "tagline", text: formatDisplayDate(date) }),
       ])
     );
 
-    shell.append(renderGlanceBar(streak, history, row));
-
-    shell.append(renderVerseCard(date));
-
-    const weatherSlot = el("div");
+    const weatherSlot = shell.querySelector(".weather-fab-slot") as HTMLElement;
     weatherSlot.append(renderWeatherLoading());
-    shell.append(weatherSlot);
     void fetchKentuckyWeather()
       .then((cities) => {
-        weatherSlot.replaceChildren(renderWeatherCard(cities, row));
+        mountWeatherFab(weatherSlot, cities, row);
       })
       .catch(() => {
         weatherSlot.replaceChildren(
-          el("div", { className: "card card-compact" }, [
-            el("h2", { text: "Weather bunny" }),
-            el("p", {
-              className: "step-hint",
-              text: "Weather unavailable — try again later.",
-            }),
-          ])
+          el("button", {
+            className: "weather-fab weather-fab-muted",
+            attrs: {
+              type: "button",
+              "aria-label": "Weather unavailable",
+              title: "Weather unavailable",
+            },
+            text: "🌤️",
+          })
         );
       });
+
+    shell.append(renderGlanceBar(streak, history, row));
+
+    shell.append(renderVerseCard(date));
 
     if (shouldShowReminderNudge(todaySubmitted)) {
       shell.append(

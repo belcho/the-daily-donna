@@ -4,6 +4,7 @@ export interface WeatherSnapshot {
   temperatureHighF?: number;
   temperatureLowF?: number;
   description: string;
+  weatherCode: number;
 }
 
 export interface CityWeather {
@@ -15,6 +16,24 @@ export interface CityWeather {
 }
 
 /** WMO weather code → plain English (Open-Meteo). */
+/** Emoji icon for current conditions (WMO code). */
+export function weatherIconForCode(code: number): string {
+  if (code === 0) return "☀️";
+  if (code <= 3) return "⛅";
+  if (code <= 48) return "🌫️";
+  if (code <= 57) return "🌦️";
+  if (code <= 67) return "🌧️";
+  if (code <= 77) return "❄️";
+  if (code <= 82) return "🌧️";
+  if (code <= 86) return "🌨️";
+  if (code <= 99) return "⛈️";
+  return "🌤️";
+}
+
+export function weatherIconLabel(code: number): string {
+  return describeWeather(code);
+}
+
 export function describeWeather(code: number): string {
   if (code === 0) return "Clear skies";
   if (code <= 3) return "Partly cloudy";
@@ -100,6 +119,7 @@ function pickLaterToday(
       label: "Later today",
       temperatureF: 0,
       description: "—",
+      weatherCode: 0,
     };
   }
 
@@ -112,6 +132,7 @@ function pickLaterToday(
     label,
     temperatureF: Math.round(pick.temp),
     description: describeWeather(pick.code),
+    weatherCode: pick.code,
   };
 }
 
@@ -179,6 +200,7 @@ async function fetchCity(
     temperatureHighF: Math.round(data.daily.temperature_2m_max[tIdx]),
     temperatureLowF: Math.round(data.daily.temperature_2m_min[tIdx]),
     description: describeWeather(data.daily.weather_code[tIdx]),
+    weatherCode: data.daily.weather_code[tIdx],
   };
 
   return {
@@ -187,6 +209,7 @@ async function fetchCity(
       label: "Now",
       temperatureF: nowTemp,
       description: describeWeather(nowCode),
+      weatherCode: nowCode,
     },
     laterToday,
     tomorrow,

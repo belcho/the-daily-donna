@@ -19,10 +19,11 @@ A gentle daily check-in for Donna — mood, vitamins, appointments, pain, and cr
 4. Run [`supabase/migrations/003_photo_storage.sql`](supabase/migrations/003_photo_storage.sql) for photo uploads.
 5. Run [`supabase/migrations/004_feedback.sql`](supabase/migrations/004_feedback.sql) for the bugs & ideas list.
 6. Run [`supabase/migrations/005_bunny_count.sql`](supabase/migrations/005_bunny_count.sql) for bunny counts.
-7. In **Project Settings → API**, copy:
+7. Run [`supabase/migrations/006_household_settings.sql`](supabase/migrations/006_household_settings.sql) for Donna’s private code.
+8. In **Project Settings → API**, copy:
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon public** key → `VITE_SUPABASE_ANON_KEY`
-8. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
+9. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
 
 Row-level security expects the `x-household-id` header (set automatically by the app). If inserts fail with a permission error, confirm the migration ran and that your household UUID is valid.
 
@@ -57,4 +58,6 @@ Optional: add `?debugDate=2026-07-21` to the URL to simulate a specific check-in
 
 ## Privacy note
 
-There is no login. The shared link and API keys in the built site mean anyone with the link could read or change entries. Keep the URL within the family only.
+Donna can set a **private code** on first open (any text she likes). The code is stored as a hash in Supabase so the same code works on a new phone; optional “remember on this phone” keeps it only in that device’s browser storage.
+
+The shared site URL still includes the Supabase anon key, so treat the link as family-only. The code locks the app on her device and keeps the experience feeling like hers.

@@ -6,6 +6,7 @@ import {
 } from "../lib/reminders";
 import { isInstalledPwa } from "../lib/pwa";
 import { getTheme, setTheme } from "../lib/theme";
+import { renderChangePrivateCodeSection } from "./donnaLock";
 
 export function renderReminders(root: HTMLElement): void {
   clear(root);
@@ -128,6 +129,8 @@ export function renderReminders(root: HTMLElement): void {
   });
   themeCard.append(el("h2", { text: "Appearance" }), darkLabel);
   root.append(themeCard);
+
+  root.append(renderChangePrivateCodeSection());
 
   if (!isInstalledPwa()) {
     root.append(

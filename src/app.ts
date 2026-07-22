@@ -6,6 +6,12 @@ import { renderCreatureLog } from "./views/creatures";
 import { renderReminders } from "./views/reminders";
 import { renderFeedback } from "./views/feedback";
 import { renderBunnyPhotos } from "./views/bunnyPhotos";
+import {
+  renderDonnaSetup,
+  renderDonnaUnlock,
+} from "./views/donnaLock";
+import { resolveDonnaLockState } from "./lib/donnaLock";
+import { isConfigured } from "./lib/supabase";
 import { el } from "./lib/dom";
 
 const appRoot = document.getElementById("app");
@@ -29,6 +35,23 @@ function parseRoute(): { name: string; param?: string } {
 
 async function route(): Promise<void> {
   if (!appRoot) return;
+
+  if (isConfigured()) {
+    const lockState = await resolveDonnaLockState();
+    if (lockState !== "ok") {
+      const shell = el("div", { className: "app-shell app-shell-lock" });
+      appRoot.replaceChildren(shell);
+      const onDone = (): void => {
+        void route();
+      };
+      if (lockState === "setup") {
+        renderDonnaSetup(shell, onDone);
+      } else {
+        renderDonnaUnlock(shell, onDone);
+      }
+      return;
+    }
+  }
 
   const shell = el("div", { className: "app-shell" });
   appRoot.replaceChildren(shell);
