@@ -4,7 +4,16 @@ import { moodLabel } from "../data/mood";
 import { effectiveBunnyCount } from "../lib/bunnyRecord";
 import { el } from "../lib/dom";
 
-export function renderSummary(row: CheckinRow): HTMLElement {
+export type SummaryOptions = {
+  /** Bunny/creature photos only appear in the gallery unless explicitly enabled (e.g. check-in review). */
+  showPhoto?: boolean;
+};
+
+export function renderSummary(
+  row: CheckinRow,
+  options?: SummaryOptions
+): HTMLElement {
+  const showPhoto = options?.showPhoto === true;
   const wrap = el("div", { className: "summary-root" });
 
   const mood =
@@ -66,7 +75,7 @@ export function renderSummary(row: CheckinRow): HTMLElement {
     sections.push({ label: "Note", value: row.note.trim() });
   }
 
-  if (row.photo_url) {
+  if (showPhoto && row.photo_url) {
     const photoWrap = el("div", { className: "summary-section" }, [
       el("div", { className: "summary-label", text: "Photo" }),
     ]);

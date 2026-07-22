@@ -18,6 +18,8 @@ import {
   mountWeatherFab,
 } from "../components/homeExtras";
 import { fetchKentuckyWeather } from "../lib/weather";
+import { fetchGoodStuffPhotos } from "../lib/goodStuff";
+import { renderGoodStuffHomeCard } from "../components/goodStuffHome";
 
 export async function renderHome(root: HTMLElement): Promise<void> {
   clear(root);
@@ -36,9 +38,10 @@ export async function renderHome(root: HTMLElement): Promise<void> {
 
   try {
     const date = getCheckinDate();
-    const [row, history] = await Promise.all([
+    const [row, history, goodStuffList] = await Promise.all([
       fetchCheckinByDate(date),
       fetchSubmittedHistory(),
+      fetchGoodStuffPhotos().catch(() => [] as Awaited<ReturnType<typeof fetchGoodStuffPhotos>>),
     ]);
     const todaySubmitted = row?.status === "submitted";
     maybeNotifyCheckIn(date, todaySubmitted);
@@ -84,6 +87,19 @@ export async function renderHome(root: HTMLElement): Promise<void> {
     shell.append(renderGlanceBar(streak, history, row));
 
     shell.append(renderVerseCard(date));
+
+    const goodStuffSlot = el("div");
+    function mountGoodStuffCard(count: number): void {
+      goodStuffSlot.replaceChildren(
+        renderGoodStuffHomeCard(count, () => {
+          void fetchGoodStuffPhotos()
+            .then((list) => mountGoodStuffCard(list.length))
+            .catch(() => {});
+        })
+      );
+    }
+    mountGoodStuffCard(goodStuffList.length);
+    shell.append(goodStuffSlot);
 
     if (shouldShowReminderNudge(todaySubmitted)) {
       shell.append(
@@ -133,6 +149,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
         el("a", { text: "Past days", attrs: { href: "#/history" } }),
         el("a", { text: "Creatures", attrs: { href: "#/creatures" } }),
         el("a", { text: "Photos", attrs: { href: "#/bunny-photos" } }),
+        el("a", { text: "Good stuff", attrs: { href: "#/good-stuff" } }),
         el("a", { text: "Reminder", attrs: { href: "#/reminders" } }),
         el("a", { text: "Bugs", attrs: { href: "#/feedback" } }),
       ])

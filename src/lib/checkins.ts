@@ -43,11 +43,32 @@ export async function fetchSubmittedHistory(): Promise<CheckinRow[]> {
   return (data ?? []).map(mapRow);
 }
 
+/** Any check-in day that has a saved photo (draft or submitted). */
+export async function fetchCheckinsWithPhotos(): Promise<CheckinRow[]> {
+  const supabase = getSupabase();
+  const hid = requireHousehold();
+
+  const { data, error } = await supabase
+    .from("checkins")
+    .select("*")
+    .eq("household_id", hid)
+    .not("photo_url", "is", null)
+    .order("checkin_date", { ascending: false });
+
+  if (error) throw error;
+  return (data ?? [])
+    .map(mapRow)
+    .filter((r) => r.photo_url?.trim());
+}
+
 export async function saveDraft(
   checkinDate: string,
   form: CheckinFormState
 ): Promise<CheckinRow> {
-  return upsertCheckin(checkinDate, form, "draft");
+  const existing = await fetchCheckinByDate(checkinDate);
+  const status: CheckinStatus =
+    existing?.status === "submitted" ? "submitted" : "draft";
+  return upsertCheckin(checkinDate, form, status);
 }
 
 export async function submitCheckin(

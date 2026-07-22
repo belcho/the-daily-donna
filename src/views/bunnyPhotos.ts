@@ -1,5 +1,5 @@
 import { el, clear } from "../lib/dom";
-import { fetchSubmittedHistory } from "../lib/checkins";
+import { fetchCheckinsWithPhotos } from "../lib/checkins";
 import { isConfigured } from "../lib/supabase";
 import { collectBunnyPhotos } from "../lib/bunnyPhotos";
 import { formatDisplayDate } from "../lib/checkinDate";
@@ -27,7 +27,7 @@ export async function renderBunnyPhotos(root: HTMLElement): Promise<void> {
   root.append(el("div", { className: "loading", text: "Loading photos…" }));
 
   try {
-    const history = await fetchSubmittedHistory();
+    const history = await fetchCheckinsWithPhotos();
     const photos = collectBunnyPhotos(history);
     clear(root);
 

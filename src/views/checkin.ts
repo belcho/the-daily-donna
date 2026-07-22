@@ -37,6 +37,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
   let step = 1;
   let saveStatus = "";
   let saving = false;
+  let photoUploading = false;
 
   root.append(el("div", { className: "loading", text: "Loading…" }));
 
@@ -107,7 +108,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         if (!form.more_creatures) return true;
         return form.creatures.length > 0;
       case 8:
-        return true;
+        return !photoUploading;
       case 9:
         return true;
       case 10:
@@ -509,6 +510,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         fileInput.addEventListener("change", () => {
           const file = fileInput.files?.[0];
           if (!file) return;
+          photoUploading = true;
           saveStatus = "Uploading photo…";
           render();
           void (async () => {
@@ -517,8 +519,11 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
               form.photo_url = url;
               showPreview(url);
               await persistDraft();
+              saveStatus = "Photo saved";
             } catch {
               saveStatus = "Photo upload failed — is storage set up?";
+            } finally {
+              photoUploading = false;
               render();
             }
           })();
@@ -587,13 +592,22 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
           checkin_date: checkinDate,
           ...preview,
         };
-        body.append(el("div", { className: "review-block" }, [renderSummary(fakeRow)]));
+        body.append(
+          el("div", { className: "review-block" }, [
+            renderSummary(fakeRow, { showPhoto: true }),
+          ])
+        );
         break;
       }
     }
   }
 
   async function handleSubmit(): Promise<void> {
+    if (photoUploading) {
+      saveStatus = "Still uploading your photo — give it a moment.";
+      render();
+      return;
+    }
     try {
       await submitCheckin(checkinDate, form);
       window.location.hash = "#/";
@@ -662,17 +676,18 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
           },
         },
       });
-      if (!canAdvance()) nextBtn.setAttribute("disabled", "");
+      if (!canAdvance() || (step === 8 && photoUploading))
+        nextBtn.setAttribute("disabled", "");
       nav.append(nextBtn);
     } else {
-      nav.append(
-        el("button", {
-          className: "btn btn-primary",
-          text: "Submit today’s check-in",
-          attrs: { type: "button" },
-          on: { click: () => void handleSubmit() },
-        })
-      );
+      const submitBtn = el("button", {
+        className: "btn btn-primary",
+        text: "Submit today’s check-in",
+        attrs: { type: "button" },
+        on: { click: () => void handleSubmit() },
+      });
+      if (photoUploading) submitBtn.setAttribute("disabled", "");
+      nav.append(submitBtn);
     }
     shell.append(nav);
 

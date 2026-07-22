@@ -519,6 +519,27 @@ body.weather-modal-open {
   color: var(--color-text);
 }
 
+.good-stuff-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.good-stuff-home .good-stuff-gallery-link {
+  margin-top: 0.5rem;
+}
+
+.good-stuff-status {
+  min-height: 1.25rem;
+  margin: 0.35rem 0 0;
+}
+
+.good-stuff-item {
+  cursor: default;
+}
+
 .bunny-count-grid {
   margin-top: 0.5rem;
 }

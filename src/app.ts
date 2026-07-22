@@ -6,6 +6,7 @@ import { renderCreatureLog } from "./views/creatures";
 import { renderReminders } from "./views/reminders";
 import { renderFeedback } from "./views/feedback";
 import { renderBunnyPhotos } from "./views/bunnyPhotos";
+import { renderGoodStuffGallery } from "./views/goodStuff";
 import {
   renderDonnaSetup,
   renderDonnaUnlock,
@@ -27,6 +28,7 @@ function parseRoute(): { name: string; param?: string } {
   if (path === "/reminders") return { name: "reminders" };
   if (path === "/feedback") return { name: "feedback" };
   if (path === "/bunny-photos") return { name: "bunnyPhotos" };
+  if (path === "/good-stuff") return { name: "goodStuff" };
   const dayMatch = path.match(/^\/day\/(\d{4}-\d{2}-\d{2})$/);
   if (dayMatch) return { name: "day", param: dayMatch[1] };
 
@@ -79,6 +81,9 @@ async function route(): Promise<void> {
       break;
     case "bunnyPhotos":
       await renderBunnyPhotos(shell);
+      break;
+    case "goodStuff":
+      await renderGoodStuffGallery(shell);
       break;
     case "day":
       if (param) await renderDay(shell, param);
