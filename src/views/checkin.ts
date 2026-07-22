@@ -482,7 +482,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
           }),
           el("p", {
             className: "step-hint",
-            text: "Optional — bunnies, creatures, or something that made you smile.",
+            text: "Optional — bunnies, creatures, or something that made you smile. Choose a photo from your library or take a new one.",
           })
         );
         const previewHost = el("div", { className: "photo-upload-row" });
@@ -490,7 +490,6 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
           attrs: {
             type: "file",
             accept: "image/*",
-            capture: "environment",
           },
         }) as HTMLInputElement;
 
