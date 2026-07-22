@@ -7,7 +7,6 @@ import { renderReminders } from "./views/reminders";
 import { renderFeedback } from "./views/feedback";
 import { renderBunnyPhotos } from "./views/bunnyPhotos";
 import { renderGoodStuffGallery } from "./views/goodStuff";
-import { renderWatchList } from "./views/watchList";
 import { renderGrocery } from "./views/grocery";
 import {
   renderDonnaSetup,
@@ -34,7 +33,6 @@ function parseRoute(): { name: string; param?: string } {
   if (path === "/feedback") return { name: "feedback" };
   if (path === "/bunny-photos") return { name: "bunnyPhotos" };
   if (path === "/good-stuff") return { name: "goodStuff" };
-  if (path === "/watch-list") return { name: "watchList" };
   if (path === "/grocery") return { name: "grocery" };
   const dayMatch = path.match(/^\/day\/(\d{4}-\d{2}-\d{2})$/);
   if (dayMatch) return { name: "day", param: dayMatch[1] };
@@ -102,9 +100,6 @@ async function route(): Promise<void> {
       break;
     case "goodStuff":
       await renderGoodStuffGallery(shell);
-      break;
-    case "watchList":
-      await renderWatchList(shell);
       break;
     case "grocery":
       await renderGrocery(shell);

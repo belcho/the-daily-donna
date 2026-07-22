@@ -23,8 +23,6 @@ import { renderGoodStuffHomeCard } from "../components/goodStuffHome";
 import { fetchGroceryItems } from "../lib/grocery";
 import { renderGroceryHomeTeaser } from "../components/grocery";
 import { renderMealWantHomeCard } from "../components/mealHome";
-import { fetchSharedVideos } from "../lib/sharedVideos";
-import { renderSharedVideosHomeCard } from "../components/sharedVideosHome";
 import { addDaysToIsoDate, getAppointmentHeadsUp } from "../lib/appointmentHeadsUp";
 import { renderAppointmentHeadsUpCard } from "../components/appointmentHeadsUp";
 import { renderWellnessSparkline } from "../components/wellnessSparkline";
@@ -49,7 +47,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
   try {
     const date = getCheckinDate();
     const yesterdayDate = addDaysToIsoDate(date, -1);
-    const [row, history, goodStuffList, yesterdayRow, encouragementNotes, sharedVideos, groceryItems] =
+    const [row, history, goodStuffList, yesterdayRow, encouragementNotes, groceryItems] =
       await Promise.all([
         fetchCheckinByDate(date),
         fetchSubmittedHistory(),
@@ -59,9 +57,6 @@ export async function renderHome(root: HTMLElement): Promise<void> {
         fetchCheckinByDate(yesterdayDate).catch(() => null),
         fetchEncouragementNotes().catch(
           () => [] as Awaited<ReturnType<typeof fetchEncouragementNotes>>
-        ),
-        fetchSharedVideos().catch(
-          () => [] as Awaited<ReturnType<typeof fetchSharedVideos>>
         ),
         fetchGroceryItems().catch(
           () => [] as Awaited<ReturnType<typeof fetchGroceryItems>>
@@ -139,19 +134,6 @@ export async function renderHome(root: HTMLElement): Promise<void> {
     mountGoodStuffCard(goodStuffList.length);
     shell.append(goodStuffSlot);
 
-    const sharedVideosSlot = el("div");
-    function mountSharedVideosCard(count: number): void {
-      sharedVideosSlot.replaceChildren(
-        renderSharedVideosHomeCard(count, () => {
-          void fetchSharedVideos()
-            .then((list) => mountSharedVideosCard(list.length))
-            .catch(() => {});
-        })
-      );
-    }
-    mountSharedVideosCard(sharedVideos.length);
-    shell.append(sharedVideosSlot);
-
     if (shouldShowReminderNudge(todaySubmitted)) {
       shell.append(
         el("div", { className: "nudge-banner nudge-banner-compact" }, [
@@ -201,7 +183,6 @@ export async function renderHome(root: HTMLElement): Promise<void> {
         el("a", { text: "Creatures", attrs: { href: "#/creatures" } }),
         el("a", { text: "Photos", attrs: { href: "#/bunny-photos" } }),
         el("a", { text: "Good stuff", attrs: { href: "#/good-stuff" } }),
-        el("a", { text: "Watch list", attrs: { href: "#/watch-list" } }),
         el("a", { text: "Grocery", attrs: { href: "#/grocery" } }),
         el("a", { text: "Reminder", attrs: { href: "#/reminders" } }),
         el("a", { text: "Bugs", attrs: { href: "#/feedback" } }),

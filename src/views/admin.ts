@@ -164,7 +164,6 @@ async function renderAdminHub(root: HTMLElement): Promise<void> {
     { label: "Check-in wizard", href: "#/check-in" },
     { label: "Grocery list", href: "#/grocery" },
     { label: "Good stuff gallery", href: "#/good-stuff" },
-    { label: "Watch list", href: "#/watch-list" },
     { label: "Bunny photos", href: "#/bunny-photos" },
     { label: "Past days", href: "#/history" },
     { label: "Bugs & encouragement jar", href: "#/feedback" },
