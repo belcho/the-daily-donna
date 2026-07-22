@@ -9,6 +9,7 @@ import {
   effectiveBunnyCount,
   formatTodayBunnies,
 } from "../lib/bunnyRecord";
+import { countBunnyPhotos } from "../lib/bunnyPhotos";
 
 function bunnyTrackerLabel(
   history: Pick<CheckinRow, "bunny_count" | "saw_bunnies" | "checkin_date">[],
@@ -42,11 +43,8 @@ function bunnyTrackerLabel(
 
 export function renderGlanceBar(
   streak: number,
-  history: Pick<CheckinRow, "bunny_count" | "saw_bunnies" | "checkin_date">[],
-  todayRow: Pick<
-    CheckinRow,
-    "bunny_count" | "saw_bunnies" | "checkin_date" | "status"
-  > | null
+  history: CheckinRow[],
+  todayRow: CheckinRow | null
 ): HTMLElement {
   const bar = el("div", { className: "home-glance-bar" });
 
@@ -68,6 +66,23 @@ export function renderGlanceBar(
       el("span", {
         className: "glance-chip-value",
         text: bunnyTrackerLabel(history, todayRow),
+      }),
+    ])
+  );
+
+  const photoCount = countBunnyPhotos(history, todayRow);
+  bar.append(
+    el("a", {
+      className: "glance-chip glance-chip-link",
+      attrs: { href: "#/bunny-photos" },
+    }, [
+      el("span", { className: "glance-chip-label", text: "Bunny photos" }),
+      el("span", {
+        className: "glance-chip-value",
+        text:
+          photoCount === 0
+            ? "None yet — tap to view"
+            : `${photoCount} saved · View all`,
       }),
     ])
   );

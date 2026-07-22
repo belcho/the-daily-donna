@@ -128,6 +128,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
       el("nav", { className: "app-footer-nav app-footer-compact" }, [
         el("a", { text: "Past days", attrs: { href: "#/history" } }),
         el("a", { text: "Creatures", attrs: { href: "#/creatures" } }),
+        el("a", { text: "Photos", attrs: { href: "#/bunny-photos" } }),
         el("a", { text: "Reminder", attrs: { href: "#/reminders" } }),
         el("a", { text: "Bugs", attrs: { href: "#/feedback" } }),
       ])
