@@ -20,6 +20,9 @@ import {
 import { fetchKentuckyWeather } from "../lib/weather";
 import { fetchGoodStuffPhotos } from "../lib/goodStuff";
 import { renderGoodStuffHomeCard } from "../components/goodStuffHome";
+import { fetchGroceryItems } from "../lib/grocery";
+import { renderGroceryHomeTeaser } from "../components/grocery";
+import { renderMealWantHomeCard } from "../components/mealHome";
 import { fetchSharedVideos } from "../lib/sharedVideos";
 import { renderSharedVideosHomeCard } from "../components/sharedVideosHome";
 import { addDaysToIsoDate, getAppointmentHeadsUp } from "../lib/appointmentHeadsUp";
@@ -46,7 +49,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
   try {
     const date = getCheckinDate();
     const yesterdayDate = addDaysToIsoDate(date, -1);
-    const [row, history, goodStuffList, yesterdayRow, encouragementNotes, sharedVideos] =
+    const [row, history, goodStuffList, yesterdayRow, encouragementNotes, sharedVideos, groceryItems] =
       await Promise.all([
         fetchCheckinByDate(date),
         fetchSubmittedHistory(),
@@ -59,6 +62,9 @@ export async function renderHome(root: HTMLElement): Promise<void> {
         ),
         fetchSharedVideos().catch(
           () => [] as Awaited<ReturnType<typeof fetchSharedVideos>>
+        ),
+        fetchGroceryItems().catch(
+          () => [] as Awaited<ReturnType<typeof fetchGroceryItems>>
         ),
       ]);
     const todaySubmitted = row?.status === "submitted";
@@ -103,6 +109,11 @@ export async function renderHome(root: HTMLElement): Promise<void> {
       });
 
     shell.append(renderGlanceBar(streak, history, row));
+
+    const mealCard = renderMealWantHomeCard(row);
+    if (mealCard) shell.append(mealCard);
+
+    shell.append(renderGroceryHomeTeaser(groceryItems));
 
     shell.append(renderVerseCard(date));
 
@@ -191,6 +202,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
         el("a", { text: "Photos", attrs: { href: "#/bunny-photos" } }),
         el("a", { text: "Good stuff", attrs: { href: "#/good-stuff" } }),
         el("a", { text: "Watch list", attrs: { href: "#/watch-list" } }),
+        el("a", { text: "Grocery", attrs: { href: "#/grocery" } }),
         el("a", { text: "Reminder", attrs: { href: "#/reminders" } }),
         el("a", { text: "Bugs", attrs: { href: "#/feedback" } }),
       ])

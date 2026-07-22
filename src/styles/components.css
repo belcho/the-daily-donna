@@ -634,6 +634,91 @@ body.weather-modal-open {
   margin-bottom: 0.75rem;
 }
 
+.meal-want-kicker {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin: 0 0 0.25rem;
+}
+
+.meal-want-title {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--color-primary-dark);
+}
+
+.meal-want-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}
+
+.grocery-add-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin-bottom: 0.5rem;
+}
+
+.grocery-add-row .field-input {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.grocery-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+}
+
+.grocery-item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.grocery-item:last-child {
+  border-bottom: none;
+}
+
+.grocery-item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 1.05rem;
+}
+
+.grocery-item-label input {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.grocery-item-got .grocery-item-label span {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.grocery-divider {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0.5rem 0 0.25rem;
+  list-style: none;
+}
+
+.grocery-empty {
+  color: var(--color-text-muted);
+  padding: 0.5rem 0;
+  list-style: none;
+}
+
+.grocery-actions {
+  margin-top: 0.75rem;
+}
+
 .shared-videos-status {
   min-height: 1.25rem;
   margin: 0.35rem 0 0;

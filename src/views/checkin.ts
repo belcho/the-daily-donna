@@ -6,6 +6,8 @@ import { fetchCheckinByDate, saveDraft, submitCheckin } from "../lib/checkins";
 import { isConfigured } from "../lib/supabase";
 import { MOOD_LABELS } from "../data/mood";
 import { CREATURES } from "../data/creatures";
+import { MEAL_OPTIONS } from "../data/meals";
+import type { MealWantId } from "../data/meals";
 import {
   facePicker,
   yesNoChoice,
@@ -16,7 +18,7 @@ import { formStateToRowFields } from "../types";
 import { uploadCheckinPhoto } from "../lib/photos";
 import { gentleHaptic } from "../lib/haptics";
 
-const TOTAL_STEPS = 10;
+const TOTAL_STEPS = 11;
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -101,18 +103,20 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
       case 5:
         return form.pain_level != null;
       case 6:
+        return form.meal_want != null;
+      case 7:
         if (form.saw_bunnies == null) return false;
         if (form.saw_bunnies === false) return true;
         return form.bunny_count != null && form.bunny_count >= 1;
-      case 7:
+      case 8:
         if (form.more_creatures == null) return false;
         if (!form.more_creatures) return true;
         return form.creatures.length > 0;
-      case 8:
-        return !photoUploading;
       case 9:
-        return true;
+        return !photoUploading;
       case 10:
+        return true;
+      case 11:
         return true;
       default:
         return false;
@@ -397,6 +401,31 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         body.append(
           el("h2", {
             className: "step-title",
+            text: "What sounds good to eat today?",
+          }),
+          el("p", {
+            className: "step-hint",
+            text: "Pick a vibe — we’ll show it on your home page so everyone knows the plan.",
+          })
+        );
+        body.append(
+          textChoice(
+            MEAL_OPTIONS.map((m) => ({ label: m.label, value: m.id })),
+            form.meal_want as MealWantId | null,
+            (v) => {
+              form.meal_want = v;
+              scheduleSave();
+              render();
+            },
+            "Food mood today"
+          )
+        );
+        break;
+      }
+      case 7: {
+        body.append(
+          el("h2", {
+            className: "step-title",
             text: "Did you see any bunnies today?",
           })
         );
@@ -482,7 +511,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         body.append(bunnyHost);
         break;
       }
-      case 7: {
+      case 8: {
         body.append(
           el("h2", {
             className: "step-title",
@@ -494,7 +523,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         renderCreatures(creatureHost);
         break;
       }
-      case 8: {
+      case 9: {
         body.append(
           el("h2", {
             className: "step-title",
@@ -568,7 +597,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         }
         break;
       }
-      case 9: {
+      case 10: {
         body.append(
           el("h2", {
             className: "step-title",
@@ -594,7 +623,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
         body.append(noteInput);
         break;
       }
-      case 10: {
+      case 11: {
         body.append(
           el("h2", {
             className: "step-title",
@@ -696,7 +725,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
           },
         },
       });
-      if (!canAdvance() || (step === 8 && photoUploading))
+      if (!canAdvance() || (step === 9 && photoUploading))
         nextBtn.setAttribute("disabled", "");
       nav.append(nextBtn);
     } else {

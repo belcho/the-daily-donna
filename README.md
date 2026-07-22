@@ -23,10 +23,11 @@ A gentle daily check-in for Donna — mood, vitamins, appointments, pain, and cr
 8. Run [`supabase/migrations/007_good_stuff.sql`](supabase/migrations/007_good_stuff.sql) for the Good stuff photo gallery.
 9. Run [`supabase/migrations/008_extras.sql`](supabase/migrations/008_extras.sql) for captions, encouragement jar, and related features.
 10. Run [`supabase/migrations/009_shared_videos.sql`](supabase/migrations/009_shared_videos.sql) for the watch list (YouTube, TikTok, links).
-11. In **Project Settings → API**, copy:
+11. Run [`supabase/migrations/010_grocery_and_meals.sql`](supabase/migrations/010_grocery_and_meals.sql) for grocery list and daily food mood.
+12. In **Project Settings → API**, copy:
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon public** key → `VITE_SUPABASE_ANON_KEY`
-12. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
+13. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
 
 Row-level security expects the `x-household-id` header (set automatically by the app). If inserts fail with a permission error, confirm the migration ran and that your household UUID is valid.
 

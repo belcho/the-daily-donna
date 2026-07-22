@@ -126,6 +126,7 @@ function mapRow(data: Record<string, unknown>): CheckinRow {
       : [],
     note: (data.note as string | null) ?? null,
     photo_url: (data.photo_url as string | null) ?? null,
+    meal_want: (data.meal_want as string | null) ?? null,
     updated_at: data.updated_at as string | undefined,
   };
 }

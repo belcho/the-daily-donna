@@ -1,6 +1,7 @@
 import type { CheckinRow } from "../types";
 import { creatureLabel } from "../data/creatures";
 import { moodLabel } from "../data/mood";
+import { mealLabel } from "../data/meals";
 import { effectiveBunnyCount } from "../lib/bunnyRecord";
 import { el } from "../lib/dom";
 
@@ -70,6 +71,13 @@ export function renderSummary(
     { label: "Pain", value: pain },
     { label: "Nature watch", value: nature || "—" },
   ];
+
+  if (row.meal_want) {
+    sections.splice(4, 0, {
+      label: "Food mood",
+      value: mealLabel(row.meal_want),
+    });
+  }
 
   if (row.note?.trim()) {
     sections.push({ label: "Note", value: row.note.trim() });
