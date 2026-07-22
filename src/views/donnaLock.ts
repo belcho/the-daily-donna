@@ -204,6 +204,15 @@ export function renderDonnaUnlock(
   card.append(status, submit);
   root.append(card);
 
+  root.append(
+    el("p", { className: "admin-lock-foot" }, [
+      el("a", {
+        text: "Family admin preview",
+        attrs: { href: "#/admin" },
+      }),
+    ])
+  );
+
   const codeEl = document.getElementById(codeId) as HTMLInputElement | null;
   codeEl?.focus();
 }

@@ -13,7 +13,9 @@ import {
   renderDonnaSetup,
   renderDonnaUnlock,
 } from "./views/donnaLock";
+import { renderAdminGate, mountAdminBanner } from "./views/admin";
 import { resolveDonnaLockState } from "./lib/donnaLock";
+import { isAdminSession } from "./lib/adminLock";
 import { isConfigured } from "./lib/supabase";
 import { el } from "./lib/dom";
 
@@ -24,6 +26,7 @@ function parseRoute(): { name: string; param?: string } {
   const path = hash.replace(/^#/, "").split("?")[0] || "/";
 
   if (path === "/" || path === "") return { name: "home" };
+  if (path === "/admin") return { name: "admin" };
   if (path === "/check-in") return { name: "checkin" };
   if (path === "/history") return { name: "history" };
   if (path === "/creatures") return { name: "creatures" };
@@ -41,6 +44,15 @@ function parseRoute(): { name: string; param?: string } {
 
 async function route(): Promise<void> {
   if (!appRoot) return;
+
+  const { name, param } = parseRoute();
+
+  if (name === "admin") {
+    const shell = el("div", { className: "app-shell app-shell-lock" });
+    appRoot.replaceChildren(shell);
+    await renderAdminGate(shell);
+    return;
+  }
 
   if (isConfigured()) {
     const lockState = await resolveDonnaLockState();
@@ -62,7 +74,9 @@ async function route(): Promise<void> {
   const shell = el("div", { className: "app-shell" });
   appRoot.replaceChildren(shell);
 
-  const { name, param } = parseRoute();
+  if (isAdminSession()) {
+    mountAdminBanner(shell);
+  }
 
   switch (name) {
     case "home":

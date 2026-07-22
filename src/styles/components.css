@@ -719,6 +719,57 @@ body.weather-modal-open {
   margin-top: 0.75rem;
 }
 
+.admin-lock-foot {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+
+.admin-lock-foot a {
+  color: var(--color-text-muted);
+}
+
+.admin-preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #3d2a52;
+  color: #f5eefc;
+  border-radius: var(--radius);
+  margin-bottom: 0.65rem;
+}
+
+.admin-preview-banner a {
+  color: #e8d4ff;
+}
+
+.admin-banner-btn {
+  border: none;
+  background: transparent;
+  color: #e8d4ff;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem;
+}
+
+.admin-nav-link {
+  margin-bottom: 0.35rem;
+}
+
+.admin-back-link {
+  display: block;
+  text-align: center;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
 .shared-videos-status {
   min-height: 1.25rem;
   margin: 0.35rem 0 0;

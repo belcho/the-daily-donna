@@ -1,5 +1,6 @@
 import { getSupabase, householdId, isConfigured } from "./supabase";
 import { hashDonnaPin } from "./pinHash";
+import { isAdminSession, fetchHouseholdSettings } from "./adminLock";
 
 const SESSION_KEY = "donna_unlocked";
 const REMEMBER_KEY = "donna_saved_code";
@@ -12,28 +13,21 @@ function requireHousehold(): string {
 }
 
 export async function fetchDonnaPinHash(): Promise<string | null> {
-  const supabase = getSupabase();
-  const hid = requireHousehold();
-
-  const { data, error } = await supabase
-    .from("household_settings")
-    .select("donna_pin_hash")
-    .eq("household_id", hid)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data?.donna_pin_hash ?? null;
+  const row = await fetchHouseholdSettings();
+  return row?.donna_pin_hash ?? null;
 }
 
 export async function saveDonnaPin(pin: string): Promise<void> {
   const supabase = getSupabase();
   const hid = requireHousehold();
   const donna_pin_hash = await hashDonnaPin(pin);
+  const existing = await fetchHouseholdSettings();
 
   const { error } = await supabase.from("household_settings").upsert(
     {
       household_id: hid,
       donna_pin_hash,
+      admin_pin_hash: existing?.admin_pin_hash ?? null,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "household_id" }
@@ -76,6 +70,7 @@ export type DonnaLockState = "setup" | "unlock" | "ok";
 /** Whether the app should show setup, unlock, or proceed. */
 export async function resolveDonnaLockState(): Promise<DonnaLockState> {
   if (!isConfigured()) return "ok";
+  if (isAdminSession()) return "ok";
 
   let storedHash: string | null;
   try {

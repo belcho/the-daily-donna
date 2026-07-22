@@ -21,6 +21,7 @@ npx supabase migration repair --status applied 007
 npx supabase migration repair --status applied 008
 npx supabase migration repair --status applied 009
 npx supabase migration repair --status applied 010
+npx supabase migration repair --status applied 011
 ```
 
 (`YOUR_PROJECT_REF` is the ID in your project URL: `https://supabase.com/dashboard/project/<ref>`.)
