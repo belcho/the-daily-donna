@@ -14,6 +14,7 @@ import {
 import { renderSummary } from "../components/summary";
 import { formStateToRowFields } from "../types";
 import { uploadCheckinPhoto } from "../lib/photos";
+import { gentleHaptic } from "../lib/haptics";
 
 const TOTAL_STEPS = 10;
 
@@ -173,7 +174,25 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
           scheduleSave();
         });
 
-        row.append(timeLabel, timeInput, descLabel, descInput);
+        const tomorrowId = `appt-tomorrow-${index}`;
+        const tomorrowLabel = el("label", {
+          className: "toggle-row appointment-tomorrow",
+          attrs: { for: tomorrowId },
+        });
+        const tomorrowInput = el("input", {
+          attrs: { id: tomorrowId, type: "checkbox" },
+        }) as HTMLInputElement;
+        tomorrowInput.checked = appt.for_tomorrow === true;
+        tomorrowInput.addEventListener("change", () => {
+          appt.for_tomorrow = tomorrowInput.checked;
+          scheduleSave();
+        });
+        tomorrowLabel.append(
+          tomorrowInput,
+          el("span", { text: "This one is tomorrow (not today)" })
+        );
+
+        row.append(timeLabel, timeInput, descLabel, descInput, tomorrowLabel);
 
         if (form.appointments.length > 1) {
           row.append(
@@ -610,6 +629,7 @@ export async function renderCheckIn(root: HTMLElement): Promise<void> {
     }
     try {
       await submitCheckin(checkinDate, form);
+      gentleHaptic();
       window.location.hash = "#/";
     } catch (err) {
       saveStatus =

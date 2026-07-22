@@ -19,7 +19,7 @@ const appRoot = document.getElementById("app");
 
 function parseRoute(): { name: string; param?: string } {
   const hash = window.location.hash || "#/";
-  const path = hash.replace(/^#/, "") || "/";
+  const path = hash.replace(/^#/, "").split("?")[0] || "/";
 
   if (path === "/" || path === "") return { name: "home" };
   if (path === "/check-in") return { name: "checkin" };

@@ -536,6 +536,104 @@ body.weather-modal-open {
   margin: 0.35rem 0 0;
 }
 
+.sparkline-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 0.35rem;
+}
+
+.sparkline-line {
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sparkline-mood {
+  stroke: var(--color-primary);
+}
+
+.sparkline-pain {
+  stroke: #c45c7a;
+}
+
+.sparkline-legend {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.sparkline-legend-mood::before {
+  content: "";
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.2rem;
+  background: var(--color-primary);
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
+.sparkline-legend-pain::before {
+  content: "";
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.2rem;
+  background: #c45c7a;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
+.encouragement-from {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0 0 0.35rem;
+}
+
+.encouragement-message {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--color-primary-dark);
+}
+
+.encouragement-refresh {
+  margin-top: 0.5rem;
+}
+
+.heads-up-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  line-height: 1.45;
+}
+
+.appointment-tomorrow {
+  margin-top: 0.35rem;
+  grid-column: 1 / -1;
+}
+
+.good-stuff-shuffle-img {
+  width: 100%;
+  border-radius: var(--radius);
+  margin: 0.5rem 0;
+}
+
+.good-stuff-caption {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.good-stuff-caption-thumb {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.good-stuff-shuffle-btn {
+  margin-bottom: 0.75rem;
+}
+
 .good-stuff-item {
   cursor: default;
 }

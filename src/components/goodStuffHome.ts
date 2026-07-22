@@ -1,5 +1,6 @@
 import { el } from "../lib/dom";
 import { addGoodStuffPhoto } from "../lib/goodStuff";
+import { gentleHaptic } from "../lib/haptics";
 
 export function renderGoodStuffHomeCard(
   savedCount: number,
@@ -18,6 +19,17 @@ export function renderGoodStuffHomeCard(
     el("p", { className: "home-lead", text: countLine })
   );
 
+  const captionId = "good-stuff-caption";
+  const captionInput = el("input", {
+    className: "field-input",
+    attrs: {
+      id: captionId,
+      type: "text",
+      placeholder: "Optional caption (coffee, the dog, this sky…)",
+      maxlength: "120",
+    },
+  }) as HTMLInputElement;
+
   const fileInput = el("input", {
     attrs: {
       type: "file",
@@ -33,23 +45,20 @@ export function renderGoodStuffHomeCard(
   });
 
   let uploading = false;
+  let pendingFile: File | null = null;
 
-  addBtn.addEventListener("click", () => {
-    if (!uploading) fileInput.click();
-  });
-
-  fileInput.addEventListener("change", () => {
-    const file = fileInput.files?.[0];
-    fileInput.value = "";
-    if (!file) return;
-
+  function uploadPending(): void {
+    if (!pendingFile || uploading) return;
     uploading = true;
     addBtn.setAttribute("disabled", "");
     status.textContent = "Uploading…";
 
     void (async () => {
       try {
-        await addGoodStuffPhoto(file);
+        await addGoodStuffPhoto(pendingFile!, captionInput.value);
+        gentleHaptic();
+        pendingFile = null;
+        captionInput.value = "";
         status.textContent = "Saved — tap View gallery to see it.";
         onUploaded();
       } catch {
@@ -57,11 +66,30 @@ export function renderGoodStuffHomeCard(
       } finally {
         uploading = false;
         addBtn.removeAttribute("disabled");
+        addBtn.textContent = "Add a photo";
       }
     })();
+  }
+
+  addBtn.addEventListener("click", () => {
+    if (uploading) return;
+    if (pendingFile) {
+      uploadPending();
+      return;
+    }
+    fileInput.click();
   });
 
-  card.append(addBtn, fileInput, status);
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files?.[0];
+    fileInput.value = "";
+    if (!file) return;
+    pendingFile = file;
+    addBtn.textContent = "Save photo";
+    status.textContent = "Add a caption if you like, then tap Save photo.";
+  });
+
+  card.append(captionInput, addBtn, fileInput, status);
 
   card.append(
     el("a", {
@@ -70,6 +98,16 @@ export function renderGoodStuffHomeCard(
       attrs: { href: "#/good-stuff" },
     })
   );
+
+  if (savedCount > 0) {
+    card.append(
+      el("a", {
+        className: "btn btn-ghost btn-block",
+        text: "Shuffle one",
+        attrs: { href: "#/good-stuff?shuffle=1" },
+      })
+    );
+  }
 
   return card;
 }

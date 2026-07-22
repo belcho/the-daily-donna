@@ -5,6 +5,8 @@ export type VitaminsReally = "not_all" | "yes_silly";
 export interface Appointment {
   time: string;
   description: string;
+  /** When true, this appointment is for the day after this check-in. */
+  for_tomorrow?: boolean;
 }
 
 export interface CheckinRow {

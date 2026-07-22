@@ -10,6 +10,7 @@ import {
   type FeedbackKind,
   type FeedbackStatus,
 } from "../lib/feedback";
+import { addEncouragementNote } from "../lib/encouragement";
 
 const STATUSES: FeedbackStatus[] = ["open", "planned", "fixed", "wontfix"];
 
@@ -119,6 +120,65 @@ export async function renderFeedback(root: HTMLElement): Promise<void> {
     );
     return;
   }
+
+  const jarCard = el("div", { className: "card" });
+  jarCard.append(
+    el("h2", { text: "Encouragement for Donna" }),
+    el("p", {
+      className: "step-hint",
+      text: "Family notes go in her jar on the home page — she’ll see them at random.",
+    })
+  );
+  const authorInput = el("input", {
+    className: "field-input",
+    attrs: {
+      type: "text",
+      placeholder: "Your name (optional)",
+      maxlength: "40",
+    },
+  }) as HTMLInputElement;
+  const jarMessage = el("textarea", {
+    className: "note-input",
+    attrs: {
+      rows: "3",
+      placeholder: "Something warm, silly, or proud…",
+      maxlength: "500",
+    },
+  }) as HTMLTextAreaElement;
+  const jarStatus = el("p", { className: "step-hint", text: "" });
+  jarCard.append(
+    el("label", { className: "field-label", text: "From" }),
+    authorInput,
+    el("label", { className: "field-label", text: "Message" }),
+    jarMessage,
+    el("button", {
+      className: "btn btn-primary btn-block",
+      text: "Drop in the jar",
+      attrs: { type: "button" },
+      on: {
+        click: () => {
+          const msg = jarMessage.value.trim();
+          if (!msg) {
+            jarStatus.textContent = "Write a little message first.";
+            return;
+          }
+          jarStatus.textContent = "Saving…";
+          void (async () => {
+            try {
+              await addEncouragementNote(msg, authorInput.value);
+              jarMessage.value = "";
+              jarStatus.textContent = "Added — Donna will see it on her home page.";
+            } catch (err) {
+              jarStatus.textContent =
+                err instanceof Error ? err.message : "Could not save.";
+            }
+          })();
+        },
+      },
+    }),
+    jarStatus
+  );
+  root.append(jarCard);
 
   let kind: FeedbackKind = "bug";
   const message = el("p", { className: "save-hint", text: "" });

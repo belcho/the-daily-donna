@@ -20,6 +20,11 @@ import {
 import { fetchKentuckyWeather } from "../lib/weather";
 import { fetchGoodStuffPhotos } from "../lib/goodStuff";
 import { renderGoodStuffHomeCard } from "../components/goodStuffHome";
+import { addDaysToIsoDate, getAppointmentHeadsUp } from "../lib/appointmentHeadsUp";
+import { renderAppointmentHeadsUpCard } from "../components/appointmentHeadsUp";
+import { renderWellnessSparkline } from "../components/wellnessSparkline";
+import { fetchEncouragementNotes } from "../lib/encouragement";
+import { renderEncouragementJarCard } from "../components/encouragementJar";
 
 export async function renderHome(root: HTMLElement): Promise<void> {
   clear(root);
@@ -38,11 +43,19 @@ export async function renderHome(root: HTMLElement): Promise<void> {
 
   try {
     const date = getCheckinDate();
-    const [row, history, goodStuffList] = await Promise.all([
-      fetchCheckinByDate(date),
-      fetchSubmittedHistory(),
-      fetchGoodStuffPhotos().catch(() => [] as Awaited<ReturnType<typeof fetchGoodStuffPhotos>>),
-    ]);
+    const yesterdayDate = addDaysToIsoDate(date, -1);
+    const [row, history, goodStuffList, yesterdayRow, encouragementNotes] =
+      await Promise.all([
+        fetchCheckinByDate(date),
+        fetchSubmittedHistory(),
+        fetchGoodStuffPhotos().catch(
+          () => [] as Awaited<ReturnType<typeof fetchGoodStuffPhotos>>
+        ),
+        fetchCheckinByDate(yesterdayDate).catch(() => null),
+        fetchEncouragementNotes().catch(
+          () => [] as Awaited<ReturnType<typeof fetchEncouragementNotes>>
+        ),
+      ]);
     const todaySubmitted = row?.status === "submitted";
     maybeNotifyCheckIn(date, todaySubmitted);
 
@@ -87,6 +100,15 @@ export async function renderHome(root: HTMLElement): Promise<void> {
     shell.append(renderGlanceBar(streak, history, row));
 
     shell.append(renderVerseCard(date));
+
+    const encouragementCard = renderEncouragementJarCard(encouragementNotes);
+    if (encouragementCard) shell.append(encouragementCard);
+
+    const headsUp = getAppointmentHeadsUp(date, row, yesterdayRow);
+    if (headsUp) shell.append(renderAppointmentHeadsUpCard(headsUp));
+
+    const sparkline = renderWellnessSparkline(date, history);
+    if (sparkline) shell.append(sparkline);
 
     const goodStuffSlot = el("div");
     function mountGoodStuffCard(count: number): void {

@@ -36,10 +36,10 @@ export function renderSummary(
 
   let appts = "No appointments today — clear calendar!";
   if (row.appointments.length > 0) {
-    const lines = row.appointments.map(
-      (a) =>
-        `${a.time.trim() || "Time TBD"} — ${a.description.trim() || "Appointment"}`
-    );
+    const lines = row.appointments.map((a) => {
+      const prefix = a.for_tomorrow ? "Tomorrow: " : "";
+      return `${prefix}${a.time.trim() || "Time TBD"} — ${a.description.trim() || "Appointment"}`;
+    });
     appts = lines.join("; ");
   }
 
