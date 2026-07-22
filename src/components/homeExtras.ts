@@ -1,6 +1,7 @@
 import { el } from "../lib/dom";
 import { verseForCheckinDate } from "../data/verses";
 import type { CityWeather } from "../lib/weather";
+import { formatWeatherSnapshotLine } from "../lib/weather";
 import type { CheckinRow } from "../types";
 import {
   computeBunnyRecord,
@@ -87,13 +88,19 @@ export function renderWeatherCard(
   for (const city of cities) {
     grid.append(
       el("div", { className: "weather-city-compact" }, [
-        el("div", { className: "weather-city-line" }, [
-          el("span", { className: "weather-city-name", text: city.name }),
-          el("span", {
-            className: "weather-city-temp",
-            text: `${city.temperatureF}°F · ${city.description}`,
-          }),
-        ]),
+        el("div", { className: "weather-city-name", text: city.name }),
+        el("div", {
+          className: "weather-forecast-line",
+          text: `Now: ${formatWeatherSnapshotLine(city.now)}`,
+        }),
+        el("div", {
+          className: "weather-forecast-line",
+          text: `${city.laterToday.label}: ${formatWeatherSnapshotLine(city.laterToday)}`,
+        }),
+        el("div", {
+          className: "weather-forecast-line",
+          text: `${city.tomorrow.label}: ${formatWeatherSnapshotLine(city.tomorrow)}`,
+        }),
         el("p", { className: "weather-bunny-note", text: city.bunnyNote }),
       ])
     );

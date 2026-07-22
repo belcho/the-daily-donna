@@ -317,21 +317,22 @@
   padding-top: 0;
 }
 
-.weather-city-line {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.25rem 0.5rem;
-  align-items: baseline;
-}
-
 .weather-city-name {
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--color-primary-dark);
+  margin-bottom: 0.2rem;
 }
 
-.weather-city-temp {
+.weather-forecast-line {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+.weather-bunny-yes {
+  margin: 0 0 0.35rem;
+  font-weight: 500;
   font-size: 0.9rem;
 }
 
