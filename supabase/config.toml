@@ -1,0 +1,5 @@
+# Supabase CLI — https://supabase.com/docs/guides/cli/config
+# Run migrations with: supabase db push (after supabase link)
+
+[db]
+major_version = 15

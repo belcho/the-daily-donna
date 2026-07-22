@@ -11,23 +11,51 @@ A gentle daily check-in for Donna — mood, vitamins, appointments, pain, and cr
 - View today’s answers and browse **past days**
 - Light purple, accessible UI (no flashing animations)
 
-## One-time Supabase setup
+## Database (migrations)
 
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Open **SQL Editor** and run the script in [`supabase/migrations/001_checkins.sql`](supabase/migrations/001_checkins.sql).
-3. Run [`supabase/migrations/002_add_note.sql`](supabase/migrations/002_add_note.sql) for optional daily notes.
-4. Run [`supabase/migrations/003_photo_storage.sql`](supabase/migrations/003_photo_storage.sql) for photo uploads.
-5. Run [`supabase/migrations/004_feedback.sql`](supabase/migrations/004_feedback.sql) for the bugs & ideas list.
-6. Run [`supabase/migrations/005_bunny_count.sql`](supabase/migrations/005_bunny_count.sql) for bunny counts.
-7. Run [`supabase/migrations/006_household_settings.sql`](supabase/migrations/006_household_settings.sql) for Donna’s private code.
-8. Run [`supabase/migrations/007_good_stuff.sql`](supabase/migrations/007_good_stuff.sql) for the Good stuff photo gallery.
-9. Run [`supabase/migrations/008_extras.sql`](supabase/migrations/008_extras.sql) for captions, encouragement jar, and related features.
-10. Run [`supabase/migrations/009_shared_videos.sql`](supabase/migrations/009_shared_videos.sql) for the watch list (YouTube, TikTok, links).
-11. Run [`supabase/migrations/010_grocery_and_meals.sql`](supabase/migrations/010_grocery_and_meals.sql) for grocery list and daily food mood.
-12. In **Project Settings → API**, copy:
+Schema lives in [`supabase/migrations/`](supabase/migrations/). **Do not** run each file in the SQL Editor every time — use one of these:
+
+### Option A — Automatic (recommended)
+
+1. In [Supabase Account → Access Tokens](https://supabase.com/dashboard/account/tokens), create a token.
+2. In Supabase **Project Settings → Database**, copy the **database password** (reset if you do not have it).
+3. Copy **Project ID** from **Project Settings → General** (same as the ref in your project URL).
+4. Add GitHub Actions secrets (repo **Settings → Secrets**):
+
+| Secret | Value |
+|--------|--------|
+| `SUPABASE_ACCESS_TOKEN` | Personal access token from step 1 |
+| `SUPABASE_DB_PASSWORD` | Database password |
+| `SUPABASE_PROJECT_ID` | Project ref / ID |
+
+When you push to `master` and migration files change, the [**Supabase migrations**](.github/workflows/supabase-migrations.yml) workflow runs `supabase db push` for you.
+
+### Option B — From your PC
+
+```bash
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_ID
+npx supabase db push
+```
+
+Windows shortcut: `.\scripts\push-migrations.ps1` (after link).
+
+### Brand-new Supabase project
+
+Run once: `npx supabase link` then `npx supabase db push` — applies **all** migrations in order.
+
+### Already ran SQL by hand?
+
+One-time baseline so the CLI does not try to re-run old scripts — see [`supabase/migrations/README.md`](supabase/migrations/README.md) (`migration repair`).
+
+## One-time app config (API keys)
+
+1. Create a free project at [supabase.com](https://supabase.com) (or use your existing one).
+2. Apply migrations (section above).
+3. In **Project Settings → API**, copy:
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon public** key → `VITE_SUPABASE_ANON_KEY`
-13. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
+4. Generate a random UUID (v4) for your household → `VITE_HOUSEHOLD_ID` (use the same value everywhere).
 
 Row-level security expects the `x-household-id` header (set automatically by the app). If inserts fail with a permission error, confirm the migration ran and that your household UUID is valid.
 
@@ -40,6 +68,14 @@ In the repo **Settings → Secrets and variables → Actions**, add:
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anon key |
 | `VITE_HOUSEHOLD_ID` | Your household UUID |
+
+Optional (auto database migrations on push):
+
+| Secret | Value |
+|--------|--------|
+| `SUPABASE_ACCESS_TOKEN` | [Supabase access token](https://supabase.com/dashboard/account/tokens) |
+| `SUPABASE_DB_PASSWORD` | Project database password |
+| `SUPABASE_PROJECT_ID` | Project ref (Settings → General) |
 
 ## Enable GitHub Pages
 

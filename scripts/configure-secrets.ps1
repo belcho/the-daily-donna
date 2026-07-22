@@ -30,6 +30,5 @@ Write-Host "GitHub Actions secrets updated."
 gh workflow run "Deploy to GitHub Pages" -R belcho/the-daily-donna
 Write-Host "Triggered GitHub Pages deploy."
 
-Write-Host ""
-Write-Host "Next: In Supabase SQL Editor, run supabase/migrations/001_checkins.sql if you have not already."
+Write-Host "Next: Apply database migrations — see README (supabase db push or GitHub Supabase migrations workflow)."
 Write-Host "Household ID for this app: $HouseholdId"
