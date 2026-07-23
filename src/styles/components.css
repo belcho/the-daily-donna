@@ -19,6 +19,8 @@
   background: var(--color-bg-card);
   color: var(--color-primary-dark);
   min-height: 44px;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 
 .face-btn[aria-pressed="true"] {
@@ -50,6 +52,9 @@
   background: var(--color-bg-card);
   font-weight: 600;
   color: var(--color-text);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pain-btn[aria-pressed="true"] {
@@ -481,9 +486,15 @@ body.weather-modal-open {
 
 .app-shell-lock {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: center;
-  min-height: 70vh;
+  min-height: 100dvh;
+}
+
+.app-shell-lock > .donna-lock-card {
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .donna-lock-card {
@@ -517,6 +528,25 @@ body.weather-modal-open {
   margin-bottom: 0.75rem;
   background: var(--color-bg-card);
   color: var(--color-text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.private-code-input {
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+
+.donna-lock-form {
+  margin: 0;
+}
+
+.donna-forget-code {
+  margin-top: 0.25rem;
+}
+
+.donna-lock-remember-hint {
+  margin-top: 0.25rem;
 }
 
 .good-stuff-file-input {
@@ -630,6 +660,18 @@ body.weather-modal-open {
   color: var(--color-text-muted);
 }
 
+.good-stuff-from-hint,
+.good-stuff-from-line {
+  font-size: 0.85rem;
+  color: var(--color-accent);
+  margin: 0.25rem 0 0.5rem;
+}
+
+.good-stuff-from-line {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
 .good-stuff-shuffle-btn {
   margin-bottom: 0.75rem;
 }
@@ -721,7 +763,9 @@ body.weather-modal-open {
 
 .admin-lock-foot {
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
   font-size: 0.85rem;
 }
 
@@ -735,13 +779,14 @@ body.weather-modal-open {
   justify-content: center;
   gap: 0.75rem;
   flex-wrap: wrap;
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 600;
   background: #3d2a52;
   color: #f5eefc;
   border-radius: var(--radius);
-  margin-bottom: 0.65rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
 }
 
 .admin-preview-banner a {

@@ -1,8 +1,10 @@
 import { getSupabase, householdId, isConfigured } from "./supabase";
-import { hashDonnaPin } from "./pinHash";
+import { hashDonnaPin, hashDonnaPinLegacy } from "./pinHash";
 import { isAdminSession, fetchHouseholdSettings } from "./adminLock";
 
 const SESSION_KEY = "donna_unlocked";
+/** Survives iOS PWA tab reloads when sessionStorage is cleared. */
+const DEVICE_UNLOCK_KEY = "donna_device_unlocked";
 const REMEMBER_KEY = "donna_saved_code";
 
 function requireHousehold(): string {
@@ -20,7 +22,7 @@ export async function fetchDonnaPinHash(): Promise<string | null> {
 export async function saveDonnaPin(pin: string): Promise<void> {
   const supabase = getSupabase();
   const hid = requireHousehold();
-  const donna_pin_hash = await hashDonnaPin(pin);
+  const donna_pin_hash = await hashDonnaPin(pin.trim());
   const existing = await fetchHouseholdSettings();
 
   const { error } = await supabase.from("household_settings").upsert(
@@ -37,16 +39,39 @@ export async function saveDonnaPin(pin: string): Promise<void> {
 }
 
 export async function pinMatches(pin: string, storedHash: string): Promise<boolean> {
-  const h = await hashDonnaPin(pin);
-  return h === storedHash;
+  const trimmed = pin.trim();
+  if (!trimmed) return false;
+  const [h, legacy] = await Promise.all([
+    hashDonnaPin(trimmed),
+    hashDonnaPinLegacy(trimmed),
+  ]);
+  return h === storedHash || legacy === storedHash;
 }
 
 export function markSessionUnlocked(): void {
-  sessionStorage.setItem(SESSION_KEY, "1");
+  try {
+    sessionStorage.setItem(SESSION_KEY, "1");
+  } catch {
+    /* private mode / storage blocked */
+  }
+  try {
+    localStorage.setItem(DEVICE_UNLOCK_KEY, "1");
+  } catch {
+    /* */
+  }
 }
 
 export function isSessionUnlocked(): boolean {
-  return sessionStorage.getItem(SESSION_KEY) === "1";
+  try {
+    if (sessionStorage.getItem(SESSION_KEY) === "1") return true;
+  } catch {
+    /* */
+  }
+  try {
+    return localStorage.getItem(DEVICE_UNLOCK_KEY) === "1";
+  } catch {
+    return false;
+  }
 }
 
 export function getRememberedCode(): string | null {
@@ -55,14 +80,23 @@ export function getRememberedCode(): string | null {
 
 export function setRememberedCode(pin: string | null): void {
   if (pin) {
-    localStorage.setItem(REMEMBER_KEY, pin);
+    localStorage.setItem(REMEMBER_KEY, pin.trim());
   } else {
     localStorage.removeItem(REMEMBER_KEY);
   }
 }
 
 export function lockSession(): void {
-  sessionStorage.removeItem(SESSION_KEY);
+  try {
+    sessionStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* */
+  }
+  try {
+    localStorage.removeItem(DEVICE_UNLOCK_KEY);
+  } catch {
+    /* */
+  }
 }
 
 export type DonnaLockState = "setup" | "unlock" | "ok";
@@ -89,6 +123,9 @@ export async function resolveDonnaLockState(): Promise<DonnaLockState> {
     markSessionUnlocked();
     return "ok";
   }
+  if (remembered) {
+    setRememberedCode(null);
+  }
 
   return "unlock";
 }
@@ -97,16 +134,38 @@ export async function unlockWithPin(
   pin: string,
   remember: boolean
 ): Promise<{ ok: true } | { ok: false; message: string }> {
-  const storedHash = await fetchDonnaPinHash();
+  const code = pin.trim();
+  if (!code) {
+    return { ok: false, message: "Enter your code to continue." };
+  }
+
+  if (!crypto.subtle) {
+    return {
+      ok: false,
+      message:
+        "This browser can’t verify your code securely. Try opening the link in Safari or Chrome.",
+    };
+  }
+
+  let storedHash: string | null;
+  try {
+    storedHash = await fetchDonnaPinHash();
+  } catch {
+    return {
+      ok: false,
+      message: "Could not reach the server. Check Wi‑Fi or signal and try again.",
+    };
+  }
+
   if (!storedHash) {
     return { ok: false, message: "No private code set up yet." };
   }
-  if (!(await pinMatches(pin, storedHash))) {
+  if (!(await pinMatches(code, storedHash))) {
     return { ok: false, message: "That code doesn’t match. Try again?" };
   }
   markSessionUnlocked();
   if (remember) {
-    setRememberedCode(pin);
+    setRememberedCode(code);
   } else {
     setRememberedCode(null);
   }

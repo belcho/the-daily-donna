@@ -9,14 +9,16 @@ import {
 
 function privateCodeInput(id: string, placeholder: string): HTMLInputElement {
   return el("input", {
-    className: "field-input",
+    className: "field-input private-code-input",
     attrs: {
       id,
-      type: "password",
+      type: "text",
       autocomplete: "off",
       autocapitalize: "off",
       autocorrect: "off",
       spellcheck: "false",
+      inputmode: "text",
+      enterkeyhint: "go",
       placeholder,
     },
   }) as HTMLInputElement;
@@ -140,26 +142,37 @@ export function renderDonnaUnlock(
 
   const codeId = "donna-unlock-code";
   const rememberId = "donna-unlock-remember";
-  const hadRemembered = getRememberedCode() !== null;
+  const remembered = getRememberedCode();
+  const hadRemembered = remembered !== null;
 
-  card.append(
+  const form = el("form", {
+    className: "donna-lock-form",
+    attrs: { action: "#" },
+  }) as HTMLFormElement;
+
+  const codeInput = privateCodeInput(codeId, "Your code");
+  if (remembered) {
+    codeInput.value = remembered;
+  }
+
+  form.append(
     el("label", {
       className: "field-label",
       attrs: { for: codeId },
       text: "Your private code",
     }),
-    privateCodeInput(codeId, "Your code")
+    codeInput
   );
 
   const rememberInput = el("input", {
     attrs: {
       id: rememberId,
       type: "checkbox",
-      ...(hadRemembered ? { checked: "true" } : {}),
     },
   }) as HTMLInputElement;
+  rememberInput.checked = hadRemembered;
 
-  card.append(
+  form.append(
     el("label", {
       className: "toggle-row",
       attrs: { for: rememberId },
@@ -170,41 +183,67 @@ export function renderDonnaUnlock(
   const submit = el("button", {
     className: "btn btn-primary btn-block",
     text: "Open my space",
-    attrs: { type: "button" },
+    attrs: { type: "submit" },
   });
 
-  submit.addEventListener("click", () => {
-    void (async () => {
-      status.textContent = "";
-      const code = (document.getElementById(codeId) as HTMLInputElement).value;
-      const remember = rememberInput.checked;
+  async function tryUnlock(): Promise<void> {
+    status.textContent = "";
+    const code = codeInput.value;
+    const remember = rememberInput.checked;
 
-      if (!code) {
-        status.textContent = "Enter your code to continue.";
+    if (!code.trim()) {
+      status.textContent = "Enter your code to continue.";
+      return;
+    }
+
+    submit.setAttribute("disabled", "");
+    try {
+      const result = await unlockWithPin(code, remember);
+      if (!result.ok) {
+        status.textContent = result.message;
+        submit.removeAttribute("disabled");
         return;
       }
+      onComplete();
+    } catch (err) {
+      status.textContent =
+        err instanceof Error ? err.message : "Something went wrong.";
+      submit.removeAttribute("disabled");
+    }
+  }
 
-      submit.setAttribute("disabled", "true");
-      try {
-        const result = await unlockWithPin(code, remember);
-        if (!result.ok) {
-          status.textContent = result.message;
-          submit.removeAttribute("disabled");
-          return;
-        }
-        onComplete();
-      } catch (err) {
-        status.textContent =
-          err instanceof Error ? err.message : "Something went wrong.";
-        submit.removeAttribute("disabled");
-      }
-    })();
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    void tryUnlock();
   });
 
-  card.append(status, submit);
-  root.append(card);
+  form.append(status, submit);
 
-  root.append(
+  if (hadRemembered) {
+    form.append(
+      el("p", {
+        className: "step-hint donna-lock-remember-hint",
+        text: "If the saved code isn’t working, clear it below and type the code again.",
+      })
+    );
+  }
+
+  const forgetBtn = el("button", {
+    className: "btn btn-ghost btn-block donna-forget-code",
+    text: "Clear saved code on this phone",
+    attrs: { type: "button" },
+  });
+  forgetBtn.addEventListener("click", () => {
+    setRememberedCode(null);
+    codeInput.value = "";
+    rememberInput.checked = false;
+    status.textContent = "Saved code cleared. Type your code and tap Open my space.";
+    codeInput.focus();
+  });
+  form.append(forgetBtn);
+
+  card.append(form);
+  card.append(
     el("p", { className: "admin-lock-foot" }, [
       el("a", {
         text: "Family admin preview",
@@ -212,9 +251,9 @@ export function renderDonnaUnlock(
       }),
     ])
   );
+  root.append(card);
 
-  const codeEl = document.getElementById(codeId) as HTMLInputElement | null;
-  codeEl?.focus();
+  codeInput.focus();
 }
 
 export function renderChangePrivateCodeSection(): HTMLElement {
